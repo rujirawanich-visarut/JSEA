@@ -1,0 +1,30 @@
+schema_version: "1.0.0"
+manifest_id: "deep-research-sbd-file-integrity-2026-08-16"
+status: "DRAFT_NOT_LOADED"
+runtime_loaded: false
+created_on: "2026-08-16"
+hash_algorithm: "SHA-256"
+raw_files_are_runtime_inputs: false
+files:
+  - file_id: "SBD-RAW-001"
+    repository_path: "First-Principles Safety-by-Design phase1.md"
+    size_bytes: 102493
+    last_write_utc: "2026-08-16T04:21:30.9042051Z"
+    sha256: "b1e0b76a7f131817b93975c666a195b45fbc1254e40b33cd62c7c41c61973149"
+    opaque_citation_occurrences: 188
+    unique_opaque_markers_in_file_namespace: 50
+    direct_http_urls: 0
+    original_file_unchanged: true
+  - file_id: "SBD-RAW-002"
+    repository_path: "First-Principles Safety-by-Design phase2.md"
+    size_bytes: 118419
+    last_write_utc: "2026-08-16T05:22:14.2213215Z"
+    sha256: "026bed48cb7ad5434e33d7f7c692e9f27caa549c56147a661acc31e689f3b138"
+    opaque_citation_occurrences: 167
+    unique_opaque_markers_in_file_namespace: 61
+    direct_http_urls: 0
+    original_file_unchanged: true
+integrity_policy:
+  - "Do not edit the raw reports to repair citations."
+  - "Recalculate hashes if the user deliberately supplies a revised export."
+  - "Treat identical marker text in different raw files as different session-local identifiers."

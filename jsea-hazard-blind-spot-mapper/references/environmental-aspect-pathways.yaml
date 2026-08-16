@@ -1,0 +1,67 @@
+schema_version: "1.0"
+catalog_id: "jsea-environmental-aspect-pathways"
+status: "operational_working_catalog"
+method: "Activity -> Aspect -> Release/Consumption -> Pathway -> Receptor -> Potential Impact"
+conditions: ["normal", "abnormal", "startup_shutdown", "change", "emergency"]
+aspects:
+  - code: "EA-01"
+    name: "Air emission and atmospheric release"
+    pathways: ["direct emission", "fugitive release", "dust", "odor", "combustion plume"]
+    receptors: ["workers", "community", "ambient air", "climate"]
+    impacts: ["air-quality deterioration", "nuisance", "health exposure", "greenhouse-gas contribution"]
+  - code: "EA-02"
+    name: "Liquid release, wastewater and drainage"
+    pathways: ["surface drain", "stormwater", "sewer", "runoff", "infiltration", "direct discharge"]
+    receptors: ["surface water", "groundwater", "soil", "treatment system", "community"]
+    impacts: ["contamination", "treatment upset", "aquatic impact", "regulatory exceedance"]
+  - code: "EA-03"
+    name: "Soil and land contamination"
+    pathways: ["spill", "leak", "uncontained storage", "contaminated equipment", "excavation spread"]
+    receptors: ["soil", "groundwater", "vegetation", "land users"]
+    impacts: ["contamination", "remediation burden", "habitat degradation"]
+  - code: "EA-04"
+    name: "Waste generation and handling"
+    pathways: ["segregation", "temporary storage", "labeling", "transport", "treatment", "disposal"]
+    receptors: ["workers", "contractor", "land", "water", "community"]
+    impacts: ["exposure", "cross-contamination", "illegal disposal", "resource loss"]
+  - code: "EA-05"
+    name: "Resource, water and material consumption"
+    pathways: ["electricity use", "fuel use", "water use", "raw material use", "single-use material"]
+    receptors: ["natural resources", "water system", "supply chain", "climate"]
+    impacts: ["depletion", "indirect emissions", "scarcity pressure", "increased waste"]
+  - code: "EA-06"
+    name: "Noise, vibration, light and nuisance"
+    pathways: ["airborne noise", "ground vibration", "night lighting", "odor", "traffic"]
+    receptors: ["community", "wildlife", "adjacent operations", "workers"]
+    impacts: ["disturbance", "complaint", "behavioral impact", "communication interference"]
+  - code: "EA-07"
+    name: "Biodiversity and habitat interaction"
+    pathways: ["land disturbance", "vegetation removal", "wildlife interaction", "water change", "light/noise intrusion"]
+    receptors: ["habitat", "flora", "fauna", "protected area"]
+    impacts: ["habitat loss", "disturbance", "injury or mortality", "ecological change"]
+  - code: "EA-08"
+    name: "Chemical and hazardous-material lifecycle"
+    pathways: ["receipt", "storage", "use", "transfer", "residue", "waste", "transport"]
+    receptors: ["worker", "air", "soil", "water", "contractor", "community"]
+    impacts: ["toxic exposure", "pollution", "fire or reaction consequence", "legacy waste"]
+  - code: "EA-09"
+    name: "Emergency environmental release"
+    pathways: ["loss of containment", "firewater", "overflow", "rupture", "transport incident", "failed containment"]
+    receptors: ["air", "soil", "surface water", "groundwater", "community", "biodiversity"]
+    impacts: ["acute pollution", "off-site impact", "long-term remediation", "regulatory response"]
+  - code: "EA-10"
+    name: "Indirect and contractor-controlled aspect"
+    pathways: ["outsourced work", "supplier activity", "waste contractor", "transport provider", "off-site treatment"]
+    receptors: ["supply chain", "community", "environment", "organization reputation"]
+    impacts: ["uncontrolled downstream impact", "compliance exposure", "traceability loss"]
+verification_fields:
+  - "activity_and_step"
+  - "aspect"
+  - "release_or_resource_use"
+  - "pathway"
+  - "receptor"
+  - "potential_impact"
+  - "condition"
+  - "existing_barrier_or_requirement"
+  - "field_evidence"
+  - "competent_role"

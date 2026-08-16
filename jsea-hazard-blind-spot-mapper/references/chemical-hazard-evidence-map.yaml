@@ -1,0 +1,307 @@
+schema_version: "1.0.0"
+schema_id: "chemical-hazard-evidence-map"
+status: "operational"
+description: >-
+  Evidence framework for chemical and process-material hazard assessment in
+  task-level JSEA. Covers mixture behavior, phase transitions, reactivity,
+  incompatibility, trace contaminants, and hazardous residues that are
+  systematically missed by occupational-hazard-only JSEA approaches.
+  Supplements PSI Pillar 1 (Hazards of Process Materials) with structured
+  evidence requirements for specific high-risk chemical scenarios.
+authority_basis:
+  - "OSHA 29 CFR 1910.119(d)(1) — Chemical hazard information requirements"
+  - "CCPS Guidelines for Chemical Reactivity Evaluation and Application to Process Design"
+  - "NFPA 652 — Standard on the fundamentals of combustible dust"
+  - "UK HSE Chemical Warehousing HSG71; HSE Chemical Safety Alert CSA 15"
+  - "AFPM — Guidance on Pyrophoric Iron Sulfide"
+  - "SDS (GHS format, all sections)"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer / Chemical Engineer"
+review_frequency: "Annual + after any chemical-related incident or new chemical introduction"
+usage_note: >-
+  This map generates evidence requests and analytical prompts only. The AI must
+  not infer chemical properties, assume mixture behavior, or declare a chemical
+  non-hazardous without named, current SDS or site-approved analytical data.
+  All values cited here are generic reference ranges; site-specific SDS governs.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 1: MIXTURE AND BULK COMPOSITION HAZARDS
+# Key principle: The hazard of a mixture is NOT the same as the hazard of
+# the dominant component. Trace components can dominate the risk.
+# ─────────────────────────────────────────────────────────────────────────────
+mixture_hazard_assessment:
+
+  - id: "CHE-01"
+    name: "Trace toxic component dominance"
+    principle: >-
+      A process stream may be predominantly non-toxic (e.g., natural gas,
+      naphtha, water) but contain trace quantities of IDLH-concentration toxic
+      components that dominate the exposure risk. The bulk chemical SDS alone
+      is insufficient.
+    common_examples:
+      - chemical: "H₂S in hydrocarbon streams"
+        idlh_ppm: 50
+        typical_sour_concentration_range: "10 – 50,000 ppm"
+        note: "Even 'sweet' streams may contain transient H₂S during upset"
+      - chemical: "Benzene in refinery streams"
+        osha_pel_ppm: 1
+        note: "BTEX streams — benzene content drives carcinogen classification"
+      - chemical: "Mercury in natural gas"
+        note: "Can contaminate aluminum heat exchangers (LNG) and cause embrittlement"
+      - chemical: "HF in alkylation unit streams"
+        idlh_ppm: 30
+        note: "Trace HF in hydrocarbon product — requires HF-specific monitoring"
+      - chemical: "Chlorine in chlorinated solvent residues"
+        idlh_ppm: 10
+      - chemical: "Ammonia in refrigeration system residues"
+        idlh_ppm: 300
+    evidence_required:
+      - "Stream composition analysis (specifying all components, not just major ones)"
+      - "SDS for each trace component confirmed or suspected"
+      - "Site atmospheric monitoring register for this area/service"
+    ai_prompt: >-
+      ยืนยันว่า stream analysis รวม trace toxic components ทั้งหมดหรือไม่
+      โดยเฉพาะ H₂S, Benzene, HF, Mercury, Chlorine, Ammonia และสาร IDLH อื่น ๆ
+      ที่อาจมีอยู่ใน stream นี้ตาม process chemistry
+    prohibited_inference: "Assume stream is safe based on bulk component SDS alone"
+
+  - id: "CHE-02"
+    name: "Flash point and flammability under operating conditions"
+    principle: >-
+      A liquid that is not flammable at ambient conditions may be flammable
+      at its operating temperature. Conversely, a cryogenic liquid may warm
+      to become flammable on release. Always compare Flash Point against
+      the operating AND ambient temperatures.
+    assessment_framework:
+      - condition: "Operating T > Flash Point"
+        risk: "Flammable vapor above liquid surface at all times — treat as permanent flammable atmosphere risk"
+        action: "Require hot-work gas test immediately before any ignition activity"
+      - condition: "Operating T < Flash Point but spill scenario could heat material"
+        risk: "Delayed flammability on warming — spill may not ignite immediately but will ignite later"
+        action: "Assess spill response timeframe vs. Flash Point warming rate"
+      - condition: "Cryogenic liquid (LNG, LOX, LN₂) released"
+        risk: "Rapid vaporization; oxygen enrichment (LOX); asphyxiation (LN₂)"
+        action: "Require atmospheric O₂ monitor; vapor cloud dispersion assessment"
+    evidence_required:
+      - "SDS Section 9 — Flash Point, Auto-Ignition Temperature, LFL, UFL"
+      - "Operating temperature from SOL sheet or P&ID"
+    ai_prompt: "อุณหภูมิปฏิบัติงานสูงกว่า Flash Point ของสารนี้หรือไม่? ถ้าใช่ พื้นที่รอบอุปกรณ์อาจถือเป็น classified area ชั่วคราวได้"
+    prohibited_inference: "Assume non-flammable without Flash Point vs. operating temperature comparison"
+
+  - id: "CHE-03"
+    causal_claim_id: "PCR-002"
+    name: "Vapor pressure and flashing liquid behavior"
+    principle: >-
+      Liquids stored or transported above their atmospheric boiling point
+      under pressure will flash to vapor when pressure is released. The
+      flashing fraction (quality) determines the fraction of liquid that
+      instantaneously vaporizes, potentially creating a flammable/toxic
+      vapor cloud or BLEVE conditions.
+    high_risk_chemicals:
+      - "LPG (propane, butane) — boiling points well below ambient"
+      - "Ammonia — boiling point -33°C at atmospheric"
+      - "Chlorine — boiling point -34°C at atmospheric"
+      - "LNG (methane) — boiling point -162°C"
+      - "Ethylene oxide — boiling point +10.7°C"
+      - "Hydrogen fluoride — boiling point +19.5°C (near ambient)"
+    flashing_indicators:
+      - "Operating pressure significantly above atmospheric"
+      - "Boiling point of chemical at atmospheric is below ambient temperature"
+      - "P&ID shows pump recirculation, pressure relief, or vapor recovery on the system"
+    evidence_required:
+      - "SDS Section 9 — Boiling point, vapor pressure at operating temperature"
+      - "PFD or operating data confirming operating pressure and temperature"
+    ai_prompt: "สารนี้เป็น Flashing Liquid หรือไม่? (Boiling point ต่ำกว่าอุณหภูมิแวดล้อม หรือถูกเก็บภายใต้ความดันสูงกว่า atmospheric) ถ้าใช่ การปลดปล่อยความดันจะสร้าง vapor cloud ได้มากเพียงใด?"
+    prohibited_inference: "Assume release of pressurized liquid is equivalent to spilling the same liquid at atmospheric conditions"
+
+  - id: "CHE-04"
+    causal_claim_id: "PCR-001"
+    name: "Phase behavior — hydraulic lock and thermal expansion"
+    principle: >-
+      Liquid-full closed systems subject to external heat (steam tracing, solar
+      radiation, process heat) will develop pressure as the liquid expands with
+      no vapor space to absorb volume change. This is a common cause of pipe
+      failures and flange leaks.
+    high_risk_scenarios:
+      - "Liquid-filled dead-legs between two closed valves under steam tracing"
+      - "Liquid-filled lines left isolated in hot service (reflux, condensate, hot oil)"
+      - "Cold liquid lines that warm up after isolation (cryogenic de-inventory lines)"
+      - "Lines between spectacle blind and car-sealed valve"
+    indicators: "Small drain volume during depressurization, resistance to opening drain valve, gauge shows higher-than-expected pressure"
+    evidence_required:
+      - "P&ID trace confirming absence of vapor space or vent path in isolated segment"
+      - "Steam tracing or heat-input source identification"
+      - "Field pressure gauge reading on isolated segment"
+    ai_prompt: "ส่วน piping ที่ถูก isolate มี vapor space หรือ vent path ที่เพียงพอหรือไม่? มี heat source (steam tracing, solar) กระทำต่อ liquid-filled segment หรือไม่?"
+    prohibited_inference: "Assume isolated segment is at atmospheric pressure without gauge confirmation"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 2: CHEMICAL REACTIVITY AND INCOMPATIBILITY
+# ─────────────────────────────────────────────────────────────────────────────
+reactivity_hazard_assessment:
+
+  - id: "CHE-05"
+    causal_claim_id: "PCR-005"
+    name: "Pyrophoric iron sulfide (FeS) in sour service"
+    classification: "Potentially critical causal hypothesis; apply SES only when runtime evidence satisfies its trigger"
+    mechanism: >-
+      Iron oxide (rust) in piping/vessels reacts with H₂S in oxygen-deficient
+      conditions to form iron sulfide (FeS). On exposure to air (oxygen), FeS
+      rapidly oxidizes back to iron oxide with sufficient exothermic heat to
+      reach incandescence, providing an ignition source for residual
+      hydrocarbons.
+    formation_indicators:
+      - "Documented sour or sulfur-containing service history"
+      - "Equipment metallurgy and corrosion/deposit history consistent with iron-sulfide formation"
+      - "Inspection, sampling, or prior cleaning records indicating dark sulfide-bearing deposits"
+    recognition_signs:
+      - "Dark scale or black powder on internal surfaces"
+      - "Sulfur odor when first opened"
+      - "Scale that glows or smokes when exposed to air"
+    treatment_boundary: >-
+      The AI may identify the oxidation-and-ignition mechanism and request an
+      approved equipment-specific method. It must not select a treatment,
+      concentration, atmosphere-control technique, PPE ensemble, or waste method.
+    evidence_required:
+      - "Confirmation of sour service history (H₂S concentration records)"
+      - "Approved decontamination procedure reference"
+      - "Completed decontamination record signed by Process Engineer"
+      - "Initial gas test (H₂S + LFL) at opening point before personnel access"
+    ai_prompt: >-
+      อุปกรณ์นี้ใช้งานใน sour service (มี H₂S) หรือไม่? ถ้าใช่ มีการยืนยัน
+      การทำ decontamination/passivation ของ Pyrophoric Iron Sulfide (FeS)
+      โดย Process Engineer แล้วหรือยัง? มีขั้นตอนการจัดการของเสีย FeS ด้วยหรือไม่?
+    prohibited_inference:
+      - "FeS is absent without confirmed decontamination record"
+      - "A generic wetting or cleaning statement proves treatment completion"
+      - "A normal LEL or oxygen reading alone disproves pyrophoric deposits"
+
+  - id: "CHE-06"
+    causal_claim_id: "PCR-003"
+    name: "Water-reactive and moisture-sensitive chemicals"
+    examples:
+      - "Sodium metal, lithium, potassium — violent H₂ generation with water"
+      - "Acetic anhydride, acetyl chloride — heat + HCl generation"
+      - "Isocyanates — CO₂ generation; polymer cross-linking"
+      - "Strong acids (H₂SO₄, HCl, HNO₃) — heat generation when diluted"
+      - "Aluminum alkyls — pyrophoric in air and water-reactive"
+    detection: "SDS Section 10 — Conditions to avoid; SDS Section 7 — Handling and storage"
+    evidence_required:
+      - "SDS Section 10 and 7 for all chemicals in service and all cleaning media"
+      - "Chemical compatibility matrix for cleaning agent vs. residue"
+    ai_prompt: "สารเคมีนี้ทำปฏิกิริยากับน้ำ ความชื้น หรือสารชะล้างที่ใช้ในการทำความสะอาดหรือไม่? ผลของปฏิกิริยาคืออะไร (ความร้อน, ก๊าซ, ความดัน)?"
+    prohibited_inference: "Water flush is always a safe decontamination medium"
+
+  - id: "CHE-07"
+    name: "Oxidizer and peroxide hazards"
+    examples:
+      - "Hydrogen peroxide (>30%) — strong oxidizer; reacts with organic matter"
+      - "Organic peroxides — heat/shock sensitive; fire and explosion risk"
+      - "Nitric acid — strong oxidizer; reacts with organics to produce heat"
+      - "Chlorine and hypochlorite — react with ammonia to produce chloramines"
+      - "Oxygen (LOX or GOX) — dramatically lowers ignition energy of all materials"
+    critical_incompatibilities:
+      - "Oxidizer + hydrocarbon/organic = potential ignition without external source"
+      - "Chlorine + ammonia = chloramines (toxic)"
+      - "H₂O₂ + organic material + heat = runaway decomposition"
+    evidence_required:
+      - "SDS Section 10 (Reactivity) for all oxidizing materials in scope"
+      - "Confirmation that oxidizer piping/equipment is not cross-contaminated with organic material"
+    ai_prompt: "มีสารออกซิไดเซอร์หรือ peroxide ในระบบหรือไม่? ถ้าใช่ มีการตรวจสอบความเข้ากันได้กับสารอินทรีย์ในพื้นที่หรือสารชะล้างหรือไม่?"
+
+  - id: "CHE-08"
+    causal_claim_id: "PCR-004"
+    name: "Runaway reaction and thermal instability"
+    indicators:
+      - "Exothermic reaction chemistry (e.g., polymerization, neutralization, nitration)"
+      - "Temperature-sensitive materials (monomers, unstable intermediates)"
+      - "Elevated temperature service near decomposition threshold"
+    key_parameters:
+      - "Onset temperature of exothermic reaction (from DSC/ARC testing or CCPS data)"
+      - "Time to maximum rate (TMR) under adiabatic conditions"
+      - "Heat of reaction and maximum credible temperature"
+    evidence_required:
+      - "PHA or process chemistry review documentation"
+      - "Operating Manual section on temperature control criticality"
+      - "Emergency cooling confirmation if required"
+    ai_prompt: "Process chemistry มีความเสี่ยง exothermic runaway หรือ thermal decomposition หรือไม่? มีระบบ cooling หรือ inhibitor injection สำหรับ emergency ที่ยืนยันพร้อมใช้งานหรือไม่?"
+    prohibited_inference: "Process chemistry is benign because the job is described as routine maintenance"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 3: HAZARDOUS RESIDUE AND CONTAMINATION
+# ─────────────────────────────────────────────────────────────────────────────
+residue_and_contamination:
+
+  - id: "CHE-09"
+    name: "Catalyst and sorbent handling"
+    risk_categories:
+      - risk: "Pyrophoric catalyst (Raney nickel, activated metal catalysts)"
+        note: "Must be handled under nitrogen or wet — spontaneously ignites in air"
+      - risk: "Toxic dust inhalation (zeolite, alumina, silica gel)"
+        note: "OSHA respirable dust limits; N95 minimum; P100 preferred"
+      - risk: "Exothermic regeneration residues"
+        note: "Spent catalyst may retain heat from regeneration; confirm cooled"
+      - risk: "Heavy metal contamination (vanadium, nickel in refinery catalyst)"
+        note: "Carcinogenic; PPE and waste classification requirements"
+    evidence_required:
+      - "Catalyst SDS (vendor-specific)"
+      - "Catalyst handling procedure (approved site document)"
+      - "Pyrophoricity status: 'virgin' vs. 'equilibrium' (spent) catalyst"
+      - "Atmospheric O₂ monitoring during confined-space catalyst handling"
+
+  - id: "CHE-10"
+    name: "NORM — Naturally Occurring Radioactive Material"
+    applicability: "Oil and gas facilities; gas processing; produced water systems"
+    formation: "Radium-226, radium-228, lead-210 scale in produced-water and sour-gas service"
+    detection: "Radiation survey with calibrated instrument before opening equipment"
+    evidence_required:
+      - "Radiation survey record for equipment in scope"
+      - "NORM waste classification and disposal permit"
+      - "Radiation dose assessment for personnel entering vessel"
+    ai_prompt: "อุปกรณ์นี้ใช้งานกับ produced water, sour gas, หรือ formation water หรือไม่? มีการทำ NORM survey ก่อนการเปิดอุปกรณ์หรือไม่?"
+    prohibited_inference: "Assume NORM is absent in oil-and-gas equipment without radiation survey"
+
+  - id: "CHE-11"
+    name: "Asbestos and legacy insulation materials"
+    applicability: "Equipment, piping, and structures in facilities built before approximately 1990"
+    risk: "Mesothelioma from inhaled asbestos fibers — no safe exposure level"
+    detection_requirement: "Asbestos survey (licensed assessor) before disturbing insulation or lagging on older equipment"
+    evidence_required:
+      - "Asbestos register for the facility or equipment"
+      - "Licensed asbestos survey for scope of work"
+    ai_prompt: "งานนี้กระทบต่อ insulation, lagging, gaskets หรือ fireproofing บนอุปกรณ์เก่าหรือไม่? มีการตรวจสอบ asbestos survey สำหรับวัสดุที่จะถูกรบกวนหรือไม่?"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 4: ATMOSPHERIC HAZARD MONITORING STANDARDS
+# ─────────────────────────────────────────────────────────────────────────────
+atmospheric_monitoring_standards:
+  pre_entry_minimum:
+    - gas: "Oxygen"
+      safe_range: "19.5% – 23.5%"
+      action_below_19_5: "DO NOT ENTER — immediate ventilation or SCBA required"
+      action_above_23_5: "DO NOT ENTER — oxygen enrichment; spontaneous ignition risk"
+    - gas: "Flammable (LEL/LFL)"
+      action_above_10pct_lfl: "DO NOT ENTER for hot work"
+      action_above_25pct_lfl: "Suspend all work — evacuate"
+    - gas: "H₂S"
+      osha_pel_ppm: 10
+      idlh_ppm: 50
+      action_above_pel: "Supplied air or SCBA required"
+    - gas: "Carbon Monoxide"
+      idlh_ppm: 1200
+      osha_pel_ppm: 50
+  monitoring_frequency:
+    initial: "Before entry"
+    during_work: "Continuous or at site-defined intervals (typically 15-30 min in permit-required spaces)"
+    after_break: "Before re-entry after any work stoppage"
+    atmosphere_change_trigger: "Re-test immediately if: adjacent work begins, conditions change, instrument alarms"
+  instrument_requirements:
+    - "Calibrated within site-defined interval (typically ≤6 months)"
+    - "Bump-tested within 24 hours of use"
+    - "Calibration gases confirmed appropriate for target chemicals"
+    - "Multi-gas monitor: O₂ + LEL + CO + H₂S as minimum for most process areas"
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. Covers: trace toxic dominance, flash point, flashing liquids, hydraulic lock, FeS/pyrophoric, water-reactive chemicals, oxidizers, runaway reaction, catalyst/NORM/asbestos, and atmospheric monitoring standards."

@@ -1,0 +1,103 @@
+version: 1.0.0
+status: DRAFT
+purpose: Patterns for challenging safeguard independence, availability, and failure dependencies.
+patterns:
+- id: DEP-01
+  name: shared_energy_or_utility
+  question: Do multiple safeguards depend on the same electrical supply, instrument air, cooling, network,
+    or utility?
+  evidence:
+  - dependency diagram
+  - failure-mode review
+  - backup availability record
+- id: DEP-02
+  name: shared_sensor_or_logic
+  question: Do prevention, alarm, trip, and indication rely on the same sensor, impulse path, logic solver,
+    data source, or configuration?
+  evidence:
+  - cause-and-effect
+  - loop/logic documentation
+  - test record
+- id: DEP-03
+  name: single_human_dependency
+  question: Do multiple layers depend on one person noticing, interpreting, and acting correctly under
+    time pressure?
+  evidence:
+  - role allocation
+  - staffing/competency record
+  - alarm or response design
+- id: DEP-04
+  name: bypass_override_or_inhibit
+  question: Can the safeguard be bypassed, overridden, inhibited, defeated, or left in manual mode?
+  evidence:
+  - bypass register
+  - authorization
+  - shift handover
+  - restoration evidence
+- id: DEP-05
+  name: degraded_or_overdue
+  question: Is the safeguard affected by overdue inspection, test, maintenance, defect, impairment, or
+    temporary repair?
+  evidence:
+  - maintenance history
+  - inspection/test status
+  - impairment register
+- id: DEP-06
+  name: not_independent_from_initiating_event
+  question: Could the same event that creates the hazard also disable the safeguard?
+  evidence:
+  - layout
+  - environmental qualification
+  - failure analysis
+- id: DEP-07
+  name: simops_interaction
+  question: Could another concurrent job alter isolation, atmosphere, ignition sources, access, drainage,
+    ventilation, evacuation, or communications?
+  evidence:
+  - SIMOPS plan
+  - permit map
+  - area coordination record
+- id: DEP-08
+  name: handover_or_contractor_interface
+  question: Does the safeguard depend on accurate handover, contractor understanding, language, supervision,
+    or ownership boundaries?
+  evidence:
+  - handover record
+  - competency verification
+  - RACI
+  - toolbox record
+- id: DEP-09
+  name: emergency_response_dependency
+  question: Does claimed mitigation assume timely detection, access, equipment, staffing, communication,
+    or external response?
+  evidence:
+  - response plan
+  - drill/test record
+  - equipment inspection
+  - access check
+- id: DEP-10
+  name: environmental_pathway_dependency
+  question: Could drains, weather, terrain, ventilation, waste routing, containment capacity, or shared
+    treatment systems defeat environmental protection?
+  evidence:
+  - drainage/containment plan
+  - weather limits
+  - waste plan
+  - capacity verification
+- id: DEP-11
+  name: document_field_mismatch
+  question: Could drawings, labels, line-up, asset identity, or procedure revision differ from field conditions?
+  evidence:
+  - approved revision
+  - field identification
+  - MOC record
+- id: DEP-12
+  name: restoration_failure
+  question: After work, could equipment, guards, alarms, valves, drains, interlocks, or environmental
+    barriers remain incorrectly restored?
+  evidence:
+  - reinstatement checklist
+  - independent verification
+  - close-out record
+analysis_rule: A listed safeguard is not credited as available or independent until evidence and field-verification
+  requirements are identified.

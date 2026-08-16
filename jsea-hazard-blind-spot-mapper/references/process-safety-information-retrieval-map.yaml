@@ -1,0 +1,257 @@
+schema_version: "1.0.0"
+schema_id: "process-safety-information-retrieval-map"
+status: "operational"
+description: >-
+  PSI Retrieval and Verification Map for task-level JSEA in chemical and
+  petrochemical process facilities. Structured around the three pillars of
+  OSHA 29 CFR 1910.119(d): (1) Hazards of Process Materials, (2) Technology
+  of the Process, and (3) Equipment in the Process.
+
+  This map defines what information the AI must request, from which source,
+  and what conditions trigger a STOP_AND_ESCALATE when PSI is absent.
+authority_basis:
+  - "OSHA 29 CFR 1910.119(d) — Process Safety Information"
+  - "CCPS Risk-Based Process Safety — Process Knowledge Management element"
+  - "API RP 750 — Management of Process Hazards"
+  - "Thailand IEAT Notification No. 34/2564 — PSM guidelines"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer"
+review_frequency: "Annual + after any MOC or process safety incident"
+sensitivity: "SITE_CONFIDENTIAL — PSI contains proprietary process information"
+usage_note: >-
+  This map generates evidence requests and escalation triggers only.
+  The AI must NOT invent PSI content, infer chemical properties, or assume
+  safe conditions when PSI is absent. Site-approved documents prevail over
+  any AI-derived content.
+
+ai_behavior_master_rule: >-
+  Before analyzing any hazard scenario that involves a process boundary
+  (pipe, vessel, reactor, column, compressor, heat exchanger, relief system,
+  drain, or any pressurized/contained system), the AI MUST check whether
+  each of the three PSI pillars has been provided or referenced. If ANY
+  mandatory PSI item is absent, the AI MUST classify it as EVIDENCE_GAP
+  with the appropriate criticality and MUST NOT assume the missing information
+  is benign or irrelevant.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PILLAR 1 — HAZARDS OF PROCESS MATERIALS
+# Source: OSHA 1910.119(d)(1); CCPS RBPS Process Knowledge
+# ─────────────────────────────────────────────────────────────────────────────
+pillar_1_hazards_of_process_materials:
+  description: "Physical, chemical, health, reactivity, and environmental properties of all substances in the process."
+  gap_classification: "CHEMICAL_SPECIFIC_INFORMATION"
+
+  required_source_documents:
+    - document: "Safety Data Sheet (SDS)"
+      sections_required: ["Section 1 (Identity)", "Section 2 (Hazards)", "Section 3 (Composition)",
+                          "Section 7 (Handling/Storage)", "Section 9 (Physical/Chemical Properties)",
+                          "Section 10 (Reactivity)", "Section 11 (Toxicology)", "Section 12 (Ecology)",
+                          "Section 14 (Transport)", "Section 15 (Regulations)"]
+      authority: "Manufacturer/Supplier — current revision"
+      staleness_trigger: "SDS older than 3 years or after any supplier revision"
+    - document: "Process stream composition analysis"
+      sections_required: ["Component list", "Concentration of each component", "Trace toxic components"]
+      authority: "Site laboratory or approved analytical service"
+      staleness_trigger: "Analysis older than site-defined frequency or after process change"
+    - document: "Chemical compatibility matrix"
+      authority: "Site engineering or approved chemical database"
+
+  mandatory_verification_prompts:
+    - id: "PSI1-01"
+      prompt: "ระบุชื่อสารหรือ mixture ทุกชนิดที่อาจอยู่ในอุปกรณ์หรือท่อนี้ รวมถึงสารตกค้างจากการผลิตก่อนหน้า"
+      english: "Identify all chemicals and mixtures that may be present in this equipment or line, including residues from previous service."
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL"
+      escalation: "STOP_AND_ESCALATE — Chemical identity unknown"
+
+    - id: "PSI1-02"
+      prompt: "มีสารพิษ trace component ที่ความเข้มข้น IDLH หรือเกิน OEL ใน stream นี้หรือไม่? (H₂S, Benzene, HF, Mercury, Chlorine, Phosgene, Ethylene Oxide, Peroxides)"
+      english: "Are there trace toxic components at IDLH or OEL-exceeding concentrations in this stream? (H₂S, Benzene, HF, Mercury, Chlorine, etc.)"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL"
+      prohibited_inference: "Assume no trace toxics without stream analysis"
+
+    - id: "PSI1-03"
+      prompt: "Flash Point ของสารหรือ mixture นี้คือเท่าไร? อุณหภูมิปฏิบัติงานสูงกว่า Flash Point หรือไม่?"
+      english: "What is the Flash Point of this material or mixture? Is the operating temperature above the Flash Point?"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL for flammable service"
+      prohibited_inference: "Assume non-flammable without Flash Point data"
+
+    - id: "PSI1-04"
+      prompt: "สารนี้ทำปฏิกิริยากับน้ำ อากาศ สนิม (เหล็กออกไซด์) สารชะล้าง (น้ำ ไอน้ำ nitrogen ตัวทำละลาย detergent) หรือสารข้างเคียงใน process หรือไม่?"
+      english: "Does this material react with water, air, rust (iron oxide), cleaning agents, or adjacent chemicals in the process?"
+      gap_if_missing: "EVIDENCE_GAP — MATERIAL"
+      note: "Critical for determining safe decontamination method and purge medium"
+
+    - id: "PSI1-05"
+      prompt: "มีความเสี่ยง Runaway reaction, Polymerization, Decomposition, Pyrophoric deposit หรือ Cryogenic embrittlement สำหรับสารนี้หรือไม่?"
+      english: "Are there runaway reaction, polymerization, decomposition, pyrophoric deposit, or cryogenic embrittlement risks for this material?"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL if service history suggests any of these"
+      pyrophoric_indicator: >-
+        If equipment is in sour service (H₂S-containing), assume Pyrophoric Iron Sulfide
+        (FeS) as AI_HYPOTHESIS until decontamination is confirmed by Process Engineer.
+
+    - id: "PSI1-06"
+      prompt: "ค่า OEL (Occupational Exposure Limit), IDLH, ERPG/AEGL และ Odor Threshold ของสารที่เกี่ยวข้องคือเท่าไร?"
+      english: "What are the OEL, IDLH, ERPG/AEGL, and odor threshold for the relevant substances?"
+      gap_if_missing: "EVIDENCE_GAP — MATERIAL"
+      note: "Required for evaluating adequacy of atmospheric monitoring and PPE selection"
+
+  pillar_1_stop_conditions:
+    - "Chemical identity is completely unknown → STOP_AND_ESCALATE (SES-01)"
+    - "Trace H₂S or other IDLH-concentration toxic confirmed but no atmospheric test → STOP_AND_ESCALATE (SES-01)"
+    - "SDS unavailable or expired for any substance in scope → EVIDENCE_GAP CRITICAL"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PILLAR 2 — TECHNOLOGY OF THE PROCESS
+# Source: OSHA 1910.119(d)(2)
+# ─────────────────────────────────────────────────────────────────────────────
+pillar_2_technology_of_the_process:
+  description: "Process chemistry, operating envelope, consequences of deviations, and maximum intended inventory."
+  gap_classification: "EQUIPMENT_SPECIFIC_INFORMATION"
+
+  required_source_documents:
+    - document: "Process Flow Diagram (PFD) + Mass & Energy Balance"
+      authority: "Site Engineering — current approved revision"
+      staleness_trigger: "After any MOC affecting the process"
+    - document: "Safe Operating Limits (SOL) sheet"
+      authority: "Site Process Engineering — current revision"
+      staleness_trigger: "After any PHA recommendation or process change"
+    - document: "PHA/HAZOP consequence register"
+      authority: "Process Safety team — current study with open items identified"
+      staleness_trigger: "After any incident or process change within 5-year revalidation cycle"
+    - document: "MOC Register (open items)"
+      authority: "MOC Coordinator — current shift"
+      staleness_trigger: "Real-time; check before every JSEA"
+
+  mandatory_verification_prompts:
+    - id: "PSI2-01"
+      prompt: "ค่า Upper Safe Limit (USL) และ Lower Safe Limit (LSL) ของ Pressure, Temperature, Flow, Level และ Composition สำหรับอุปกรณ์ที่กระทบคือเท่าไร?"
+      english: "What are the Upper and Lower Safe Limits for Pressure, Temperature, Flow, Level, and Composition for the affected equipment?"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL"
+      prohibited_inference: "Assume current conditions are within safe limits without SOL data"
+
+    - id: "PSI2-02"
+      prompt: "ขณะนี้ระบบอยู่ในสถานะใด? (P, T, Level ปัจจุบัน) ใครเป็นคนยืนยันสถานะ zero-energy ในสนาม?"
+      english: "What is the current system state (actual P, T, Level)? Who confirms zero-energy state in the field?"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL for any pressurized work"
+      prohibited_inference: "Assume P=0 or T=ambient without field instrument confirmation"
+
+    - id: "PSI2-03"
+      prompt: "ปริมาณสูงสุดที่ตั้งใจกักเก็บ (Maximum Intended Inventory) สำหรับส่วนของระบบที่อาจปลดปล่อยสารหากเกิด LOPC คือเท่าไร?"
+      english: "What is the maximum intended inventory for the process segment that could be released in an LOPC event?"
+      gap_if_missing: "EVIDENCE_GAP — MATERIAL (required for consequence estimation)"
+      note: "Not required to be precise but must not be assumed negligible"
+
+    - id: "PSI2-04"
+      prompt: "มี PHA/HAZOP recommendation ที่ยังเปิดอยู่และเกี่ยวข้องกับพื้นที่หรืออุปกรณ์ที่จะทำงานนี้หรือไม่?"
+      english: "Are there open PHA/HAZOP recommendations relevant to the area or equipment involved in this task?"
+      gap_if_missing: "EVIDENCE_GAP — HIGH"
+      note: "Open PHA items may indicate known but unresolved hazard scenarios"
+
+    - id: "PSI2-05"
+      prompt: "มีรายการ MOC ที่เปิดอยู่หรือการเปลี่ยนแปลงชั่วคราวที่ยังไม่ได้ PSSR ในพื้นที่งานนี้หรือไม่?"
+      english: "Are there open MOC items or unreviewed temporary changes in the work area?"
+      gap_if_missing: "EVIDENCE_GAP — HIGH"
+      note: "Temporary changes may create unexpected isolation, venting, or chemistry hazards"
+
+    - id: "PSI2-06"
+      prompt: "ผลที่จะเกิดขึ้นหาก P, T, หรือ Level เบี่ยงเบนเกิน Safe Envelope ในขณะที่งานนี้กำลังดำเนินการคืออะไร?"
+      english: "What are the consequences if P, T, or Level deviates beyond the Safe Operating Envelope while this task is underway?"
+      gap_if_missing: "EVIDENCE_GAP — MATERIAL"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PILLAR 3 — EQUIPMENT IN THE PROCESS
+# Source: OSHA 1910.119(d)(3)
+# ─────────────────────────────────────────────────────────────────────────────
+pillar_3_equipment_in_the_process:
+  description: "P&IDs, materials of construction, electrical classification, relief design, mechanical integrity."
+  gap_classification: "EQUIPMENT_SPECIFIC_INFORMATION"
+
+  required_source_documents:
+    - document: "Piping and Instrumentation Diagram (P&ID)"
+      authority: "Site Engineering — current approved revision (field-verified against as-built)"
+      staleness_trigger: "After any MOC; field-verify against physical configuration before JSEA"
+    - document: "Equipment Datasheets"
+      authority: "Site Engineering"
+      staleness_trigger: "After any MOC or re-rating"
+    - document: "Hazardous Area Classification Drawing"
+      authority: "Site Electrical Engineering — current approved revision"
+      staleness_trigger: "After any process change, new equipment installation, or MOC"
+    - document: "Relief System Design and Basis"
+      authority: "Process Engineering — current approved"
+      staleness_trigger: "After any process change, relief device inspection, or MAWP change"
+    - document: "Mechanical Integrity / Inspection Records"
+      authority: "Inspection Engineering — current inspection cycle"
+      staleness_trigger: "Per inspection frequency schedule"
+    - document: "Bypass / Inhibit / Impairment Register"
+      authority: "Operations / Control Room — current shift"
+      staleness_trigger: "Real-time; check before JSEA and before work start"
+
+  mandatory_verification_prompts:
+    - id: "PSI3-01"
+      prompt: "P&ID หมายเลขและ revision อะไรที่ครอบคลุมพื้นที่งานนี้? P&ID ได้รับการยืนยันกับสภาพจริงในสนามแล้วหรือยัง?"
+      english: "What P&ID number and revision covers this work area? Has the P&ID been field-verified against actual physical configuration?"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL"
+      prohibited_inference: "Assume P&ID is current without verification"
+
+    - id: "PSI3-02"
+      prompt: "ท่อและอุปกรณ์ทำจากวัสดุใด (Carbon Steel, Stainless Steel, Alloy, PTFE-lined ฯลฯ)? วัสดุสอดคล้องกับสารเคมีและสารชะล้างที่ใช้หรือไม่?"
+      english: "What are the materials of construction for the pipe and equipment (CS, SS, Alloy, PTFE-lined, etc.)? Are they compatible with the chemicals and cleaning media?"
+      gap_if_missing: "EVIDENCE_GAP — MATERIAL"
+      prohibited_inference: "Assume material compatibility without datasheet confirmation"
+
+    - id: "PSI3-03"
+      prompt: "ท่อระบายแรงดัน (Relief Valve, Rupture Disc) ระบายไปที่ใด — Flare header, Closed drain, Atmospheric vent หรือ Scrubber? ท่อทางระบายเปิดอยู่หรือไม่? มี Car-seal-open record กำกับหรือไม่?"
+      english: "Where does the pressure relief device outlet route — flare, closed drain, atmospheric vent, or scrubber? Is the relief path open and verified? Is there a car-seal-open record?"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL (blocked relief = SES-04)"
+      stop_condition: "Relief path confirmed blocked → STOP_AND_ESCALATE (SES-04)"
+
+    - id: "PSI3-04"
+      prompt: "มี Alarm, Trip, SIS Interlock หรือ Permissive ใดที่ถูก Bypass, Inhibited, หรืออยู่ใน Manual mode ขณะนี้? มีใบ MOC หรือ Compensating Measure กำกับหรือไม่?"
+      english: "Are any alarms, trips, SIS interlocks, or permissives currently bypassed, inhibited, or in manual mode? Is there a MOC or compensating measure in place?"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL (uncompensated bypass = SES-05)"
+      stop_condition: "Critical SIS bypassed without compensating measure → STOP_AND_ESCALATE (SES-05)"
+
+    - id: "PSI3-05"
+      prompt: "การจัดประเภทพื้นที่ไฟฟ้า (Electrical Area Classification) ณ จุดทำงานคือ Zone/Division ใด? เครื่องมือไฟฟ้าและอุปกรณ์ชั่วคราวทุกชิ้นมี Ex-rating ที่เหมาะสม (ATEX/IECEx) หรือไม่?"
+      english: "What is the electrical area classification at the work location (Zone 0/1/2 or Class I Div 1/2)? Do all electrical tools and temporary equipment carry appropriate Ex-certification?"
+      gap_if_missing: "EVIDENCE_GAP — CRITICAL for hot work or electrical work in classified areas"
+
+    - id: "PSI3-06"
+      prompt: "มีประวัติการสึกกร่อน (Corrosion), การซ่อมแซมชั่วคราว, Remaining Wall Thickness ต่ำกว่า allowance หรือ การตรวจสอบ (Inspection) ที่เกินกำหนดสำหรับอุปกรณ์ในพื้นที่งานนี้หรือไม่?"
+      english: "Is there a history of corrosion, temporary repair, below-minimum wall thickness, or overdue inspection for equipment in the work boundary?"
+      gap_if_missing: "EVIDENCE_GAP — HIGH"
+      stop_condition: "Active corrosion at work boundary with known fitness-for-service concern → CRITICAL_REVIEW or STOP_AND_ESCALATE"
+
+    - id: "PSI3-07"
+      prompt: "มี Dead-legs, Spectacle Blinds หรือ Car-sealed valves ภายในขอบเขต Isolation ที่อาจกักเก็บแรงดันหรือสารเคมีตกค้างไว้หรือไม่?"
+      english: "Are there dead-legs, spectacle blinds, or car-sealed valves within the isolation boundary that could trap pressure or chemical residue?"
+      gap_if_missing: "EVIDENCE_GAP — MATERIAL"
+      prohibited_inference: "Assume isolation boundary is complete and pressure-free without P&ID trace"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PSI GATE — MINIMUM CHECK BEFORE ANY PROCESS-BOUNDARY HAZARD ANALYSIS
+# ─────────────────────────────────────────────────────────────────────────────
+psi_gate:
+  description: >-
+    Before beginning Step 4 (Hazard/Energy Scan) of the JSEA workflow, the AI
+    MUST perform this gate check for any task that involves a process boundary.
+  gate_questions:
+    - "Has the chemical identity of all substances in the affected equipment been confirmed? (Pillar 1)"
+    - "Have the Safe Operating Limits and current operating state been provided? (Pillar 2)"
+    - "Has the current approved P&ID been identified and field-verified? (Pillar 3)"
+    - "Is the bypass/inhibit register status known for this area? (Pillar 3)"
+    - "Are there open MOC or PHA/HAZOP items for this area? (Pillar 2)"
+  gate_outcome:
+    all_answered: "Proceed with process-boundary hazard analysis"
+    any_critical_missing: >-
+      Classify as EVIDENCE_GAP (CRITICAL). Suspend process-boundary analysis.
+      Request information from named competent role. Do not proceed to hazard analysis
+      of process boundary until critical gaps are resolved.
+    only_material_missing: >-
+      Proceed as preliminary analysis with all gaps labeled AI_HYPOTHESIS.
+      Generate explicit evidence request list.
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. Implements PSI 3-pillar retrieval map per OSHA 1910.119(d)."

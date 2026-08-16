@@ -1,0 +1,93 @@
+version: 1.0.0
+status: DRAFT
+purpose: Evidence classes and field-verification boundaries for JSEA safeguard review.
+evidence_states:
+- AVAILABLE_UNVERIFIED
+- VERIFIED_BY_DOCUMENT
+- VERIFIED_BY_RECORD
+- FIELD_VERIFICATION_REQUIRED
+- SPECIALIST_VERIFICATION_REQUIRED
+- CONFLICTING
+- MISSING
+- NOT_APPLICABLE
+verification_classes:
+- id: EV-01
+  name: documentary_review
+  examples:
+  - approved procedure
+  - drawing
+  - SDS
+  - isolation standard
+  - environmental requirement
+  boundary: Document review does not confirm actual field condition.
+- id: EV-02
+  name: record_or_log_review
+  examples:
+  - inspection record
+  - maintenance status
+  - calibration
+  - bypass register
+  - training/competency record
+  boundary: Record existence does not confirm current availability or identity.
+- id: EV-03
+  name: field_observation
+  examples:
+  - asset identification
+  - access/egress
+  - housekeeping
+  - containment route
+  - SIMOPS interface
+  boundary: Must be performed by authorized personnel under site rules.
+- id: EV-04
+  name: physical_identification_check
+  examples:
+  - verified isolation identity
+  - label and drawing match
+  - barrier location
+  boundary: AI cannot perform or certify the check.
+- id: EV-05
+  name: approved_functional_or_proof_test
+  examples:
+  - alarm/trip proof test
+  - ventilation check
+  - emergency equipment test
+  boundary: Only authorized competent persons may plan and execute tests under approved methods.
+- id: EV-06
+  name: specialist_review
+  examples:
+  - process safety
+  - electrical
+  - mechanical
+  - occupational hygiene
+  - environmental
+  - lifting
+  - scaffolding
+  boundary: AI may identify the need but not supply the professional conclusion.
+- id: EV-07
+  name: authorized_decision
+  examples:
+  - permit approval
+  - residual-risk acceptance
+  - work suspension/continuation
+  boundary: HUMAN_ONLY_DECISION.
+critical_information_examples:
+- job scope and steps
+- hazard mechanism
+- chemical/material identity where relevant
+- process/energy state where relevant
+- proposed safeguard
+- known bypass/degradation
+- applicable site authority
+field_pack_fields:
+- item
+- reason
+- evidence_owner
+- verification_method
+- acceptance_source
+- status
+- reviewer
+- date_time
+- remarks
+privacy_rule: Do not request or expose personal or health data unless necessary, authorized, proportionate,
+  and governed by applicable policy.
+human_notice: AI output is preparatory decision support and cannot verify conditions or authorize work.

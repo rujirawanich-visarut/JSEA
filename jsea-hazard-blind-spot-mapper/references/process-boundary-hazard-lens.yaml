@@ -1,0 +1,98 @@
+schema_version: "1.0.0"
+schema_id: "process-boundary-hazard-lens"
+status: "operational"
+description: >-
+  Specific hazard discovery lenses for tasks breaching, interfacing with, or operating
+  near chemical and petrochemical process boundaries. Expands hazard families HE-03,
+  HE-04, HE-06, and HE-07 into granular process-specific failure modes.
+authority_basis:
+  - "OSHA 29 CFR 1910.119(d) Process Safety Information"
+  - "CCPS Guidelines for Chemical Process Quantitative Risk Analysis"
+  - "API RP 752 / API RP 753 Facility Siting"
+  - "UK HSE HSG253 The safe isolation of plant and equipment"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer / SSHE Lead"
+review_frequency: "Annual + after any process boundary breach incident"
+
+boundary_lenses:
+  - lens_id: "PBL-01"
+    name: "Flange Joint Breaking & Bolting Relaxation"
+    target_equipment: "Flanged piping, valve bodies, orifice plates, spectacle blinds"
+    initiating_mechanisms:
+      - "Uneven bolt loosening allowing gasket blowout under residual pressure."
+      - "Spraying of toxic/flammable liquid through the gap on first break away from worker."
+      - "Piping spring/misalignment causing sudden deflection and kinetic strike."
+    critical_inquiries:
+      - "Is the first break performed on the bolt side FACING AWAY from the technician?"
+      - "Is a flange spray shield or deflection wrap installed before loosening the last bolts?"
+      - "Has zero-energy state been confirmed by opening an intermediate bleed/vent valve?"
+    mandatory_evidence: "Line Breaking Permit + Verified P&ID + Gauge at Zero + PPE Chemical Shield"
+    escalation_trigger: "Pressure gauge indicates residual pressure > 0 barg or product is IDLH toxic."
+
+  - lens_id: "PBL-02"
+    name: "Small Bore Connections (SBC) & Instrument Tubing Fatigue"
+    target_equipment: "1/2-inch to 2-inch impulse lines, pressure transmitter tapings, drain nipples, thermowells"
+    initiating_mechanisms:
+      - "High-frequency acoustic or mechanical vibration causing fatigue cracking at root weld."
+      - "Worker stepping on or using small-bore piping as handhold/foot support."
+      - "Corrosion Under Insulation (CUI) on thin-walled stainless steel or carbon steel tubing."
+    critical_inquiries:
+      - "Are small-bore connections adequately braced against mechanical/acoustic vibration?"
+      - "Is there visual evidence of external corrosion, pitting, or rust staining beneath insulation?"
+      - "Is work planned near unbraced SBCs that could be inadvertently struck during rigging or scaffolding?"
+    mandatory_evidence: "Piping vibration survey log / visual inspection record"
+    escalation_trigger: "Active vibration or structural wall thinning observed on SBC connected to live high-pressure hydrocarbon/toxic line."
+
+  - lens_id: "PBL-03"
+    causal_claim_id: "PCR-001"
+    name: "Trapped Liquid Expansion & Hydraulic Lock in Dead-Legs"
+    target_equipment: "Blocked line segments between closed valves, bypass loops, dead-end headers, sample stations"
+    initiating_mechanisms:
+      - "Solar radiation or steam tracing heating trapped liquid, generating hundreds of bars of hydraulic pressure."
+      - "Freezing of trapped aqueous liquid causing pipe splitting and subsequent loss of containment on thaw."
+    critical_inquiries:
+      - "Are there dead-legs or unvented line sections between isolation points?"
+      - "Is thermal relief protection (TRV) present and operational on isolated liquid lines exposed to heat/sun?"
+      - "Has steam tracing or electrical heat tracing been de-energized and tagged out?"
+    mandatory_evidence: "P&ID markup showing all vents/drains in the isolated section"
+    escalation_trigger: "Liquid-filled isolated segment exposed to heat source without open vent or TRV."
+
+  - lens_id: "PBL-04"
+    causal_claim_id: "PCR-002"
+    name: "Depressurization, Flashing & Low-Temperature Material Concern"
+    target_equipment: "Depressurization lines, flare headers, liquid gas expansion valves (LPG, Ethylene, Propylene, Ammonia, CO2)"
+    initiating_mechanisms:
+      - "Depressurization can change temperature through flashing, phase change, heat transfer, and Joule-Thomson behavior; direction and magnitude depend on the actual fluid state and path."
+      - "Where the resulting metal temperature is below the approved material limit, loss of toughness or other material damage may become credible."
+    critical_inquiries:
+      - "What is the calculated minimum metal temperature during depressurization vs. equipment MDMT?"
+      - "Which approved depressurization scenario, fluid-property basis, and heat-transfer assumptions apply?"
+      - "What material limits and equipment ratings apply at each potentially cold location?"
+    mandatory_evidence: "Process depressurization calculation + MDMT datasheet"
+    escalation_trigger: "Blowdown calculation indicates metal temperature will drop below MDMT."
+
+  - lens_id: "PBL-05"
+    causal_claim_id: "PCR-005"
+    name: "Pyrophoric Scale (FeS) Oxidation Upon Atmospheric Exposure"
+    target_equipment: "Sour crude/gas vessels, sour water strippers, amine units, sulfur recovery units (SRU), flare knock-out drums"
+    initiating_mechanisms:
+      - "Iron sulfide scale drying out and reacting exothermically with atmospheric oxygen upon opening equipment."
+      - "Pyrophoric ignition of residual hydrocarbon vapors or packing material."
+    critical_inquiries:
+      - "Does service history and deposit evidence make pyrophoric material credible for this equipment?"
+      - "Has the approved equipment-specific decontamination or passivation procedure been completed and recorded?"
+      - "What approved opening, atmosphere-control, monitoring, and waste-handling method applies to this equipment?"
+    mandatory_evidence: "Service history + approved equipment-specific procedure + completion record + competent-role verification"
+    escalation_trigger: "Credible pyrophoric deposit exposure without a verified equipment-specific control and waste-handling basis."
+
+  - lens_id: "PBL-06"
+    name: "Valve Seat Leakage Across High-Differential Pressure Boundaries"
+    target_equipment: "Process isolation valves, bypass valves, control valve handwheels"
+    initiating_mechanisms:
+      - "Worn or debris-damaged valve seats allowing high-pressure gas/liquid to seep past block valves into work zone."
+      - "Passing isolation valve repressurizing a de-pressurized header during worker intervention."
+    critical_inquiries:
+      - "Has seat tightness been proven by opening the intermediate body cavity bleed valve and observing zero continuous flow/pressure build-up?"
+      - "If bleed valve shows continuous passing, is physical positive isolation (spectacle blind/spade) installed before work proceeds?"
+    mandatory_evidence: "Valve seat leak test record & Intermediate bleed verification log"
+    escalation_trigger: "Passing valve on single-block or DBB boundary without positive blind."

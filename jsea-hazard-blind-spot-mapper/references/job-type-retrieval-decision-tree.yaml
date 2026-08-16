@@ -1,0 +1,220 @@
+schema_version: "1.0.0"
+schema_id: "job-type-retrieval-decision-tree"
+status: "operational"
+description: >-
+  Per-job-type document retrieval guidance. Defines the minimum set of
+  documents the AI should request based on the job type identified in the
+  JSEA framing step. This tree prevents the AI from requesting every possible
+  PSI document for every job (which is inefficient) while ensuring that
+  critical documents are never omitted for high-hazard job types.
+  This tree is a retrieval guide only — not a risk classification.
+authority_basis:
+  - "OSHA 29 CFR 1910.119 — Safe work practices; PSM"
+  - "UK HSE HSG250 — PTW: defining work scope"
+  - "CCPS RBPS — Safe work practices element"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer / SSHE Lead"
+review_frequency: "Annual + after any incident revealing a retrieval gap"
+usage_note: >-
+  Job types are not mutually exclusive. A single task may span multiple types
+  (e.g., hot work + confined space entry during vessel inspection). Apply all
+  matching job-type retrieval rules. When in doubt about job type, apply the
+  most restrictive applicable type.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DECISION NODE 1: Is the task inside or at a process boundary?
+# ─────────────────────────────────────────────────────────────────────────────
+decision_node_1:
+  question: "Does the task involve any contact with, opening of, connection to, or work inside a pipe, vessel, tank, heat exchanger, column, compressor, pump, reactor, or any pressurized or chemically-bearing system?"
+  yes_route: "Apply PSI Gate (process-safety-information-retrieval-map.yaml) FIRST. Then apply job-type rules below."
+  no_route: "Apply general occupational-hazard job-type rules below (no mandatory PSI Gate for non-process-boundary tasks)."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JOB TYPE RETRIEVAL RULES
+# ─────────────────────────────────────────────────────────────────────────────
+job_types:
+
+  - type_id: "JT-01"
+    name: "Line Breaking and Flange Connection/Disconnection"
+    description: "Any task requiring opening, disconnecting, reconnecting, or isolating piping flanges, fittings, or connections in process service."
+    risk_level: "CRITICAL"
+    mandatory_retrieval:
+      - "P&ID (current revision, field-verified) — confirm line identity, service, isolation points, dead-legs [PSI-3]"
+      - "SDS for all chemicals in service [PSI-1]"
+      - "Stream composition analysis (trace toxic) [PSI-1]"
+      - "Safe Operating Limits sheet — current P and T [PSI-2]"
+      - "Site isolation standard — acceptable isolation type for service class [PSI-3]"
+      - "Blind/Spade List — confirm isolation type and position [PSI-3]"
+      - "Field pressure gauge reading on isolated segment [PCV-G1]"
+      - "Decontamination record and gas test result [PCV-G3]"
+      - "Relief path status (if relevant to isolated segment) [PSI-3]"
+      - "MOC register — open items for this area [PSI-2]"
+    additional_if_toxic:
+      - "IDLH and OEL values for confirmed toxic components [PSI-1]"
+      - "Atmospheric monitoring plan (continuous) [PCV-G3]"
+      - "Positive isolation (spectacle blind/spade) mandatory — DBB challenged for IDLH service [ICP-02]"
+    re_jsea_triggers: ["RT-01 (scope expansion)", "RT-06 (unexpected hazard)", "RT-08 (field vs. P&ID mismatch)"]
+    psi_gate: "MANDATORY"
+
+  - type_id: "JT-02"
+    name: "Equipment Opening — Vessel, Column, Reactor, Heat Exchanger"
+    description: "Opening of any pressurized or chemically-bearing equipment (manholes, inspection ports, blind flanges)."
+    risk_level: "CRITICAL"
+    mandatory_retrieval:
+      - "P&ID and equipment datasheet [PSI-3]"
+      - "SDS for all chemicals in service (including traces) [PSI-1]"
+      - "Service history — sour service (H₂S) → FeS check [CHE-05]"
+      - "Decontamination procedure reference [PSI-1]"
+      - "Decontamination completion record [PCV-G3]"
+      - "Gas test record (LFL, O₂, H₂S, and service-specific toxics) [PCV-G3]"
+      - "Inspection record — last inspection result and current MI status [PSI-3]"
+      - "Positive physical isolation confirmation [ICP-02/03]"
+      - "Field pressure and temperature gauge confirmation [PCV-G1, G2]"
+      - "Relief system status (car-seal-open) [PSI-3]"
+    additional_if_sour_service:
+      - "FeS decontamination/passivation procedure [CHE-05]"
+      - "FeS waste handling plan [CHE-05]"
+    re_jsea_triggers: ["RT-06 (unexpected residue or deposits)", "RT-09 (safeguard impairment)"]
+    psi_gate: "MANDATORY"
+
+  - type_id: "JT-03"
+    name: "Confined Space Entry"
+    description: "Entry into any confined space (vessel, column, pit, tank, sewer, pipeline, enclosed duct)."
+    risk_level: "CRITICAL"
+    mandatory_retrieval:
+      - "Confined space classification (permit-required vs. non-permit-required) [PSI-3]"
+      - "SDS for chemicals that have been or could be in the space [PSI-1]"
+      - "Gas test result before each entry [PCV-G3]"
+      - "Atmospheric monitoring plan — continuous or frequency [PCV-G3]"
+      - "Rescue plan — rescue method, rescuer, equipment, and communication [SES-10]"
+      - "Ventilation arrangement confirmation [PCV-G3]"
+      - "Adjacent operations that may introduce atmosphere change [SES-07, RT-10]"
+      - "Energy isolation (LOTO for all internal energy sources) [PCV-G4]"
+    additional_if_sour_service:
+      - "FeS decontamination [CHE-05]"
+      - "H₂S-specific rescue procedure [SES-10]"
+    re_jsea_triggers: ["RT-03 (isolation change)", "RT-09 (gas monitor failure)", "RT-12 (work suspension > site interval)"]
+    psi_gate: "MANDATORY"
+    never_proceed_without: ["Gas test before each entry", "Confirmed rescue capability"]
+
+  - type_id: "JT-04"
+    name: "Hot Work (Welding, Grinding, Cutting, Open Flame)"
+    description: "Any work that introduces an ignition source: welding, grinding, oxygen-cutting, brazing, drilling, or use of non-Ex-rated electrical equipment in a process area."
+    risk_level: "HIGH"
+    mandatory_retrieval:
+      - "Hazardous Area Classification Drawing [PSI-3]"
+      - "Pre-work gas test result (LFL < 1% for hot work entry) [PSCE-07]"
+      - "Continuous gas monitoring plan during work [PSCE-07]"
+      - "Hot Work Permit [Tier 1]"
+      - "Adjacent and overhead operations — SIMOPS [SES-07]"
+      - "Fire protection arrangement (active suppression, portable extinguishers, firewatch) [Tier 1]"
+    additional_if_classified_area:
+      - "Ex-rating certificate for all electrical tools [PSCE-07]"
+    psi_gate: "CONDITIONAL — apply if hot work on or adjacent to process boundary"
+    re_jsea_triggers: ["RT-10 (new adjacent permit)", "RT-11 (weather/wind change)"]
+
+  - type_id: "JT-05"
+    name: "Working at Height"
+    description: "Any task where a worker is at risk of falling 1.8 m or more (scaffold, ladder, aerial platform, roof, structure)."
+    risk_level: "HIGH"
+    mandatory_retrieval:
+      - "Scaffold inspection certificate (if scaffold is used) [Tier 1]"
+      - "Working at height rescue and recovery plan [SES-10]"
+      - "Weather limit specification — wind speed, lightning [RT-11]"
+      - "Adjacent lifting or crane operations — SIMOPS [SES-07]"
+      - "Fall arrest equipment inspection date [Tier 1]"
+    psi_gate: "NOT_REQUIRED unless task also involves process boundary"
+    re_jsea_triggers: ["RT-04 (supervisor absent)", "RT-11 (weather deterioration)"]
+
+  - type_id: "JT-06"
+    name: "Chemical Cleaning, Flushing, or Decontamination"
+    description: "Introduction of cleaning agents, solvents, steam, water, or other media into process equipment or piping for cleaning, passivation, or decontamination purposes."
+    risk_level: "HIGH"
+    mandatory_retrieval:
+      - "SDS for cleaning agent [PSI-1]"
+      - "Chemical compatibility matrix — cleaning agent vs. process residue vs. equipment material [CHE-06]"
+      - "Drain destination confirmation — closed drain or contained? [PSCE-02]"
+      - "Equipment MAWP vs. cleaning pressure [PSI-3]"
+      - "Decontamination method appropriateness for chemical service (water-reactive chemicals?) [CHE-06]"
+      - "Environmental disposal plan for spent cleaning solution [PSCE-02]"
+    additional_if_sour:
+      - "FeS decontamination guidance [CHE-05]"
+    psi_gate: "MANDATORY — cleaning is a process boundary interaction"
+    re_jsea_triggers: ["RT-06 (unexpected reaction observed)", "RT-15 (unexpected gas test result after cleaning)"]
+
+  - type_id: "JT-07"
+    name: "Instrument Calibration, Loop Test, or SIS Maintenance"
+    description: "Any maintenance activity on process instruments, control loops, safety switches, safety valves, or SIS components."
+    risk_level: "HIGH"
+    mandatory_retrieval:
+      - "Bypass/Inhibit register — confirm all bypasses are authorized with MOC [PSI-3]"
+      - "Cause & Effect diagram for affected instruments/trips [PSI-3]"
+      - "Compensating measures for bypassed SIS [SES-05]"
+      - "MOC authorization for any temporary bypass [SES-05]"
+      - "Relief system status if safety valve is being maintained [PSCE-03]"
+    psi_gate: "MANDATORY for SIS/interlock work; STANDARD for non-SIS instrument work"
+    re_jsea_triggers: ["RT-05 (replacement technician unfamiliar with SIS)", "RT-09 (SIS remains unavailable beyond planned duration)"]
+
+  - type_id: "JT-08"
+    name: "Electrical Isolation, Panel Work, and Motor Maintenance"
+    description: "Work on electrical systems, panels, switchgear, motors, MCCs, or associated control systems."
+    risk_level: "HIGH"
+    mandatory_retrieval:
+      - "Single-line diagram (current approved revision) [PSI-3]"
+      - "LOTO procedure for specific equipment [PCV-G4]"
+      - "Voltage verification at point of work [PCV-G4]"
+      - "Backfeed and stored energy identification [PCV-G4]"
+      - "Hazardous area classification if work is in classified area [PSCE-07]"
+      - "Arc flash assessment (if applicable) [Tier 1]"
+    psi_gate: "NOT_REQUIRED unless work involves process-boundary equipment"
+    re_jsea_triggers: ["RT-03 (additional energy source found)", "RT-06 (voltage detected after LOTO)"]
+
+  - type_id: "JT-09"
+    name: "Lifting and Crane Operations"
+    description: "Crane lifts, heavy equipment movement, rigging, and suspended load operations."
+    risk_level: "HIGH"
+    mandatory_retrieval:
+      - "Lift plan (engineered lift plan if critical lift) [Tier 1]"
+      - "Crane inspection certificate [Tier 1]"
+      - "Ground bearing capacity confirmation [Tier 1]"
+      - "Overhead powerline or obstacle clearance confirmation [Tier 1]"
+      - "SIMOPS — personnel or operations under lift path [SES-07]"
+      - "Weather limit: wind speed, visibility [RT-11]"
+    psi_gate: "NOT_REQUIRED unless lifting over live process equipment"
+    re_jsea_triggers: ["RT-11 (wind speed exceeds lift limit)", "RT-10 (new personnel under lift path)"]
+
+  - type_id: "JT-10"
+    name: "Catalyst Handling and Spent Catalyst Removal"
+    description: "Loading, unloading, sampling, or disposal of process catalyst or spent sorbent."
+    risk_level: "CRITICAL"
+    mandatory_retrieval:
+      - "Catalyst SDS (vendor-specific, including pyrophoricity status) [CHE-09]"
+      - "Catalyst handling procedure [CHE-09]"
+      - "Pyrophoricity classification — virgin, equilibrium, or spent [CHE-09]"
+      - "N₂ inert atmosphere confirmation (for pyrophoric catalyst) [CHE-09]"
+      - "NORM survey result (if applicable to service) [CHE-10]"
+      - "Confined space entry JSEA if vessel entry required [JT-03]"
+      - "Waste classification and disposal permit [CHE-09]"
+    psi_gate: "MANDATORY"
+    re_jsea_triggers: ["RT-06 (unexpected pyrophoric behavior observed)"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DECISION SUPPORT OUTPUT
+# ─────────────────────────────────────────────────────────────────────────────
+retrieval_output_format:
+  when_job_type_identified: |
+    Job Type: [JT-0X] — [Name]
+    Mandatory retrieval documents: [list from job_type.mandatory_retrieval]
+    PSI Gate required: [YES/NO/CONDITIONAL]
+    Additional requirements: [if applicable]
+    Re-JSEA triggers to watch: [list]
+
+    EVIDENCE_GAP items (documents not provided by user):
+    [For each mandatory document not provided]
+    - [Document name]: EVIDENCE_GAP — [CRITICAL/MATERIAL/NON_CRITICAL]
+      Request from: [role per competent-role-routing-matrix.yaml]
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. 10 job types with retrieval rules, psi_gate classification, and re-JSEA trigger cross-references."

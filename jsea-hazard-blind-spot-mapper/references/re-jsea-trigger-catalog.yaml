@@ -1,0 +1,260 @@
+schema_version: "1.0.0"
+schema_id: "re-jsea-trigger-catalog"
+status: "operational"
+description: >-
+  Structured catalog of conditions that require the JSEA to be reviewed,
+  updated, or completely re-performed before work continues. When any trigger
+  is detected, the AI must flag it and route to the appropriate authority.
+  AI must not authorize continuation of work after a trigger condition is
+  identified.
+authority_basis:
+  - "OSHA 29 CFR 1910.119 — Management of Change; Pre-Startup Safety Review"
+  - "ISO 45001:2018 §8.1.3 — Management of change"
+  - "CCPS RBPS — Management of change; Conduct of operations elements"
+  - "UK HSE HSG250 — Permit-to-Work (re-issue and suspension conditions)"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer / SSHE Lead"
+review_frequency: "Annual + after any incident triggered by failure to re-JSEA"
+applies_to:
+  - "jsea-hazard-blind-spot-mapper v1.1.0+"
+  - "jsea-safeguard-challenge-assistant v1.1.0+"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TRIGGER CATEGORIES
+# ─────────────────────────────────────────────────────────────────────────────
+
+trigger_categories:
+
+  MANDATORY:
+    description: >-
+      Re-JSEA (or permit suspension and re-issue) is required before any
+      further work. AI must issue STOP_AND_ESCALATE and route to Area Owner
+      or PTW Administrator.
+    ai_action: "Issue STOP_AND_ESCALATE. State trigger. Route to named authority. Do not authorize continuation."
+
+  HIGH:
+    description: >-
+      Re-JSEA is strongly recommended. AI must flag as CRITICAL_REVIEW and
+      request competent-person assessment before continuation.
+    ai_action: "Issue CRITICAL_REVIEW. State trigger. Request competent-person assessment."
+
+  MONITOR:
+    description: >-
+      Condition warrants active monitoring and readiness to suspend work.
+      AI must flag as HIGH_REVIEW and request periodic review.
+    ai_action: "Issue HIGH_REVIEW. Flag condition. Request defined monitoring interval."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TRIGGERS
+# ─────────────────────────────────────────────────────────────────────────────
+
+triggers:
+
+  # ── SCOPE AND METHOD CHANGES ──────────────────────────────────────────────
+
+  - id: "RT-01"
+    category: "MANDATORY"
+    trigger_name: "Work scope expanded beyond original JSEA"
+    description: "The job now covers additional steps, areas, equipment, or activities not in the original JSEA."
+    examples:
+      - "Additional pipe spool found to be damaged — extending the replacement"
+      - "Access to a second vessel required that was not in original scope"
+      - "Tool substitution requires energy source not previously identified"
+    detection_signal: "User describes additional work or equipment not in original step list"
+    escalation_route: "Area Owner → PTW Administrator → SSHE"
+
+  - id: "RT-02"
+    category: "MANDATORY"
+    trigger_name: "Method or procedure has materially changed"
+    description: "The work method is significantly different from what the JSEA analyzed."
+    examples:
+      - "Cold cutting replaced by hot-work grinding"
+      - "Manual lift replaced by crane operation"
+      - "Chemical cleaning replaced by mechanical cleaning (or vice versa)"
+    detection_signal: "Method description differs from original job steps"
+    escalation_route: "Supervisor → Engineering (if method change requires design review) → PTW Administrator"
+
+  - id: "RT-03"
+    category: "MANDATORY"
+    trigger_name: "Energy source or process boundary has changed"
+    description: "The equipment or lines included in the isolation scheme have changed."
+    examples:
+      - "Additional valve or blind added to isolation boundary"
+      - "Different isolation point found necessary after field walk"
+      - "Relief device found to route differently than P&ID shows"
+    detection_signal: "User describes isolation that differs from JSEA's isolation scheme"
+    escalation_route: "Isolation Authority → Operations Supervisor → PTW Administrator"
+
+  # ── TEAM AND PERSONNEL CHANGES ────────────────────────────────────────────
+
+  - id: "RT-04"
+    category: "MANDATORY"
+    trigger_name: "Key competent role is no longer available"
+    description: "A role specifically named in the JSEA as responsible for a critical control is absent."
+    examples:
+      - "The Confined Space Supervisor is unavailable and no replacement named"
+      - "The Radiation Protection Officer has left site before radiography is complete"
+      - "The Competent Person for gas testing is replaced by an unqualified person"
+    detection_signal: "User mentions key role absent or replaced without equivalent competency"
+    escalation_route: "Supervisor → Area HSE → Area Owner"
+
+  - id: "RT-05"
+    category: "HIGH"
+    trigger_name: "Work team composition has materially changed"
+    description: "Significant portion of the work team is replaced by unfamiliar workers mid-job."
+    examples:
+      - "Shift change brings entirely new crew without toolbox talk"
+      - "Contractor supervisor replaced with a person unfamiliar with the JSEA"
+    detection_signal: "User mentions shift change or new team members joining"
+    escalation_route: "Supervisor → Area Owner"
+    minimum_action: "Toolbox talk with new team members before continuation; consider formal re-JSEA"
+
+  # ── CONDITIONS AND ENVIRONMENT ────────────────────────────────────────────
+
+  - id: "RT-06"
+    category: "MANDATORY"
+    trigger_name: "Unexpected hazard discovered during task execution"
+    description: "A hazard is discovered during work that was not identified in the original JSEA."
+    examples:
+      - "Unknown substance discovered in 'empty' vessel"
+      - "Trapped pressure found after isolation was declared complete"
+      - "Unknown chemical residue with unknown properties found in line"
+      - "Pyrophoric deposits observed when equipment is opened"
+    detection_signal: "User describes unexpected material, pressure, or condition in the work zone"
+    escalation_route: "Immediate STOP_AND_ESCALATE → Supervisor → Process Safety → Area Owner"
+
+  - id: "RT-07"
+    category: "MANDATORY"
+    trigger_name: "Incident or near-miss occurred during the job"
+    description: "Any incident, injury, near-miss, or unplanned release has occurred."
+    examples:
+      - "Worker injured during task execution"
+      - "Small chemical spill occurred at the work location"
+      - "Tool dropped from height narrowly missed another worker"
+    detection_signal: "User mentions any incident, injury, or near-miss"
+    escalation_route: "Immediate work stop → Incident investigation → Area Owner → SSHE"
+
+  - id: "RT-08"
+    category: "MANDATORY"
+    trigger_name: "Equipment condition differs materially from P&ID or work order"
+    description: "Physical field conditions differ significantly from the drawings used to plan the work."
+    examples:
+      - "Blind not in the location shown on P&ID"
+      - "Additional valve found in the isolation boundary not shown on drawing"
+      - "Equipment tag number does not match the JSEA"
+    detection_signal: "User mentions mismatch between P&ID/work order and field conditions"
+    escalation_route: "Stop work → Operations Supervisor → Engineering (P&ID discrepancy report)"
+
+  - id: "RT-09"
+    category: "MANDATORY"
+    trigger_name: "Critical safeguard has become unavailable"
+    description: "A safeguard identified in the JSEA as critical has been impaired, failed, or is no longer available."
+    examples:
+      - "Atmospheric monitor calibration found to be expired during job"
+      - "Rescue team called away from site during confined-space entry"
+      - "Fire extinguisher found empty at start of hot work"
+      - "Safety shower found non-functional in chemical work area"
+    detection_signal: "User mentions safeguard failure, unavailability, or impairment during work"
+    escalation_route: "Suspend work → Restore safeguard or provide equivalent → Area HSE review"
+
+  - id: "RT-10"
+    category: "MANDATORY"
+    trigger_name: "SIMOPS conflict introduced after JSEA issued"
+    description: "A new concurrent job, permit, or operation has been initiated that creates a conflict with the current JSEA."
+    examples:
+      - "Hot work permit issued in adjacent area during ongoing line-breaking activity"
+      - "Vessel entry permit in same unit as ongoing pressurized purging"
+      - "Simultaneous lifting operation over live process equipment not coordinated"
+    detection_signal: "User mentions new adjacent job, permit, or operation started"
+    escalation_route: "Area Coordinator → PTW Administrator → Operations Superintendent"
+
+  - id: "RT-11"
+    category: "MANDATORY"
+    trigger_name: "Weather conditions deteriorate beyond JSEA planning assumptions"
+    description: "Weather conditions now exceed the limits assumed in the JSEA."
+    examples:
+      - "Lightning activity begins during external hot work"
+      - "Wind speed exceeds lifting limit or atmospheric dispersion assumption"
+      - "Flash flooding threatens drainage and spill containment"
+      - "Visibility drops below limit for crane or vehicle operations"
+    detection_signal: "User mentions weather change during ongoing work"
+    escalation_route: "Supervisor → Area Owner"
+
+  - id: "RT-12"
+    category: "MANDATORY"
+    trigger_name: "Work suspended >24 hours"
+    description: "Work has been suspended for more than 24 hours. Conditions, team, and atmosphere may have changed."
+    examples:
+      - "Job suspended overnight due to weather"
+      - "Equipment failure delays work to the following day"
+    detection_signal: "User mentions resuming work after a significant break"
+    minimum_action: "Pre-restart inspection; re-verify isolation; atmosphere re-test (confined space); team re-briefing"
+    escalation_route: "Supervisor reviews JSEA and confirms conditions unchanged before restart"
+    note: "Site may have shorter re-test intervals (e.g., 4–8 hours for confined space)"
+
+  # ── OPEN ITEMS AND ORGANIZATIONAL CONTEXT ────────────────────────────────
+
+  - id: "RT-13"
+    category: "HIGH"
+    trigger_name: "Open MOC item relevant to work area identified after JSEA issued"
+    description: "A Management of Change item affecting the scope of work was found after the JSEA was approved."
+    examples:
+      - "Piping modification under MOC-2026-045 affects the isolation boundary"
+      - "Temporary jumper installed under MOC affects alarm logic for the area"
+    detection_signal: "User or AI identifies open MOC in the work area not reflected in the JSEA"
+    escalation_route: "Process Engineer → MOC Coordinator → PTW Administrator"
+
+  - id: "RT-14"
+    category: "HIGH"
+    trigger_name: "Open PHA/HAZOP recommendation directly affecting task area"
+    description: "An unresolved PHA or HAZOP recommendation relates to the hazards or equipment in scope."
+    examples:
+      - "HAZOP finding: 'high pressure in line 4201 with no isolation between control valve and vessel' — addressed in JSEA?"
+      - "PHA recommendation: 'install ESD on discharge of P-101' — still open"
+    detection_signal: "User mentions or AI identifies open PHA/HAZOP items in the area"
+    escalation_route: "Process Safety Engineer → Area Owner"
+
+  - id: "RT-15"
+    category: "HIGH"
+    trigger_name: "Decontamination result differs from expectation"
+    description: "Gas test or sampling after claimed decontamination shows residual hazardous atmosphere or chemical."
+    examples:
+      - "Gas test after purging shows residual H₂S above PEL"
+      - "LFL reading shows >1% LFL in 'cleaned' vessel"
+      - "Analytical sample of drain shows above-threshold concentration"
+    detection_signal: "Gas test or sample result shows unexpected contamination after decontamination claimed"
+    escalation_route: "STOP_AND_ESCALATE → Process Engineer → Occupational Hygienist"
+
+  - id: "RT-16"
+    category: "MONITOR"
+    trigger_name: "Process conditions approaching operating limits during maintenance"
+    description: "Operating data indicates process is approaching SOL boundaries while maintenance work is ongoing on connected or adjacent equipment."
+    examples:
+      - "Pressure rising in adjacent vessel while blinding nearby pipe"
+      - "Temperature alarm during cleaning operation on connected heat exchanger"
+    detection_signal: "User mentions process condition changes or alerts during work"
+    escalation_route: "Operations Supervisor → Process Engineer"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AI BEHAVIOR ON TRIGGER DETECTION
+# ─────────────────────────────────────────────────────────────────────────────
+ai_behavior_on_trigger:
+  mandatory:
+    - "Issue STOP_AND_ESCALATE with trigger ID and name"
+    - "State the specific observation or condition"
+    - "Name the escalation route"
+    - "Do not offer to continue analysis pending escalation"
+    - "Do not suggest workarounds that substitute for re-JSEA"
+  high:
+    - "Issue CRITICAL_REVIEW with trigger ID and name"
+    - "Request competent-person assessment"
+    - "Offer to assist with the re-JSEA but not to authorize continuation"
+  monitor:
+    - "Issue HIGH_REVIEW with trigger ID and name"
+    - "Request defined monitoring action"
+    - "Flag that trigger conditions may escalate to MANDATORY"
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. 16 re-JSEA triggers across scope/method changes, team changes, field conditions, incidents, SIMOPS, weather, and organizational open items."

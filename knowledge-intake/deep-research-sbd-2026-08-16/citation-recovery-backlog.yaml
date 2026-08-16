@@ -1,0 +1,32 @@
+schema_version: "1.0.0"
+backlog_id: "deep-research-sbd-citation-recovery-2026-08-16"
+status: "DRAFT_NOT_LOADED"
+backlog_status: "OPEN_NON_BLOCKING"
+runtime_loaded: false
+policy:
+  - "Never infer a public source from an opaque marker name."
+  - "Marker namespaces are local to each raw report."
+  - "Only direct sources in source-manifest.yaml may support a reviewed claim."
+  - "Unresolved report prose remains quarantined and cannot become canonical evidence."
+summary:
+  raw_files: 2
+  opaque_marker_occurrences: 355
+  unique_marker_names_within_file_namespaces: 111
+  direct_http_urls_in_raw_reports: 0
+  original_bibliography_received: false
+backlog:
+  - backlog_id: "SBD-CIT-001"
+    raw_file_id: "SBD-RAW-001"
+    status: "AWAITING_ORIGINAL_BIBLIOGRAPHY"
+    occurrence_count: 188
+    unique_marker_count: 50
+    markers: [turn14search1, turn14search13, turn14search17, turn14search3, turn14search5, turn14search7, turn15view1, turn17search0, turn17search27, turn17search4, turn17search5, turn18search0, turn18search1, turn18search10, turn18search12, turn18search2, turn18search20, turn18search4, turn18search6, turn19view1, turn20search0, turn20search1, turn20search11, turn20search13, turn20search15, turn20search17, turn20search19, turn20search7, turn20search9, turn21search1, turn21search2, turn21search20, turn21search3, turn21search5, turn21search6, turn21search7, turn2search12, turn2search13, turn2search25, turn4search3, turn5view3, turn8search0, turn8search12, turn8search19, turn8search2, turn8search23, turn8search31, turn8search4, turn8search5, turn9search0]
+    next_action: "Obtain the original Deep Research bibliography/export if available; otherwise retain only independently recovered claim sources."
+  - backlog_id: "SBD-CIT-002"
+    raw_file_id: "SBD-RAW-002"
+    status: "AWAITING_ORIGINAL_BIBLIOGRAPHY"
+    occurrence_count: 167
+    unique_marker_count: 61
+    markers: [turn0file0, turn0search19, turn0search7, turn0search9, turn11search0, turn11search12, turn11search13, turn11search14, turn11search18, turn11search19, turn11search2, turn11search20, turn11search21, turn11search22, turn11search4, turn11search8, turn11search9, turn1search0, turn1search12, turn1search17, turn1search19, turn1search22, turn1search3, turn2search0, turn2search12, turn2search17, turn2search20, turn2search21, turn2search3, turn2search5, turn3search19, turn3search3, turn3search5, turn3search9, turn4view0, turn4view1, turn5search0, turn5search10, turn5search5, turn5search6, turn6search1, turn6search12, turn6search14, turn6search16, turn6search3, turn6search4, turn6search5, turn6search8, turn7search10, turn7search13, turn7search3, turn8search10, turn8search16, turn8search2, turn8search5, turn9search11, turn9search12, turn9search13, turn9search14, turn9search2, turn9search22]
+    next_action: "Obtain the original Deep Research bibliography/export if available; otherwise retain only independently recovered claim sources."
+closure_rule: "This backlog can close only when every marker is mapped from the original export or explicitly retired; independent source recovery does not retroactively identify a marker."

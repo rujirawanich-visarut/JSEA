@@ -1,0 +1,33 @@
+schema_version: "1.0"
+crosswalk_id: "jsea-to-enterprise-risk-crosswalk"
+status: "indicative_secondary_linkage"
+usage_note: >-
+  Shows possible enterprise-level implications of task hazards. It is not a
+  substitute for enterprise risk assessment, CSA, legal review, or final taxonomy mapping.
+links:
+  - hazard_codes: ["HE-01", "HE-02", "HE-03", "HE-04", "HE-05", "HE-07", "HE-08", "HE-09", "HE-10", "HE-11", "HE-12", "HE-14", "HE-15", "HE-18"]
+    enterprise_lenses:
+      - {domain: "Operation", category: "Operation excellent", risk: "Safety Security Health and Environment (SSHE)"}
+      - {domain: "Compliance", category: "Regulatory", risk: "Safety / Health / Engineering"}
+  - hazard_codes: ["HE-01", "HE-03", "HE-04", "HE-05", "HE-16"]
+    enterprise_lenses:
+      - {domain: "Operation", category: "Operation excellent", risk: "Reliability & Asset Integrity"}
+      - {domain: "Operation", category: "Hazards", risk: "Business interruption"}
+  - hazard_codes: ["HE-13", "HE-17"]
+    enterprise_lenses:
+      - {domain: "Operation", category: "People and human resources", risk: "Accountability / Skills and competencies / Manpower"}
+      - {domain: "Operation", category: "Third-party and managed services", risk: "Contract compliance and vendor reliability"}
+  - hazard_codes: ["HE-16"]
+    enterprise_lenses:
+      - {domain: "Operation", category: "IT and Data management", risk: "IT reliability / Data integrity / Cybersecurity"}
+  - environmental_codes: ["EA-01", "EA-02", "EA-03", "EA-04", "EA-05", "EA-06", "EA-07", "EA-08", "EA-09", "EA-10"]
+    enterprise_lenses:
+      - {domain: "Operation", category: "Operation excellent", risk: "SSHE"}
+      - {domain: "Compliance", category: "Regulatory", risk: "Environment"}
+      - {domain: "Strategic", category: "Sustainability", risk: "Stakeholder expectation / Public perception / Climate Change"}
+  - hazard_codes: ["HE-18"]
+    environmental_codes: ["EA-09"]
+    enterprise_lenses:
+      - {domain: "Operation", category: "Hazards", risk: "Crisis management"}
+      - {domain: "Operation", category: "Communication", risk: "Crisis communications"}
+      - {domain: "Strategic", category: "Governance", risk: "Reputation"}

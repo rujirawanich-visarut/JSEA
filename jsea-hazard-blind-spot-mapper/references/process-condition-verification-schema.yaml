@@ -1,0 +1,211 @@
+schema_version: "1.0.0"
+schema_id: "process-condition-verification-schema"
+status: "operational"
+description: >-
+  Structured schema for verifying that a process system has reached a safe
+  state (zero-energy, de-inventoried, decontaminated) before task execution
+  on process boundaries. Defines the evidence required at each verification
+  step and the conditions that must be confirmed before opening any pressurized
+  or chemical-bearing system.
+authority_basis:
+  - "OSHA 29 CFR 1910.147 — Control of Hazardous Energy (LOTO)"
+  - "OSHA 29 CFR 1910.119 — PSM: Mechanical Integrity; Hot Work"
+  - "UK HSE HSG253 — Safe isolation of plant and equipment"
+  - "CCPS RBPS — Asset integrity and reliability; Safe work practices"
+  - "NFPA 70E — Electrical LOTO requirements"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer / Operations Lead"
+review_frequency: "Annual + after any energy-release incident or LOTO failure"
+applies_to:
+  - "jsea-hazard-blind-spot-mapper v1.1.0+"
+  - "jsea-safeguard-challenge-assistant v1.1.0+"
+usage_note: >-
+  This schema generates verification questions and evidence requirements.
+  AI cannot confirm zero-energy state from descriptions alone.
+  All confirmations require named competent persons and field instruments.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GATE 1: PRESSURE AND CONTAINMENT VERIFICATION
+# ─────────────────────────────────────────────────────────────────────────────
+gate_1_pressure_verification:
+  gate_id: "PCV-G1"
+  purpose: "Confirm process pressure is at safe level for the intended task"
+  prerequisite_for: "Any line-breaking, equipment opening, or flange disconnection"
+
+  verification_steps:
+    - step: 1
+      action: "Identify the depressurization method used"
+      evidence_required: "Procedure reference or description: flare, vent, blowdown, or drain"
+      ai_question: "ระบบถูก depressurize โดยวิธีใด? ไปยัง Flare, Closed vent, Open vent หรือ Drain? ใครเป็นผู้ดำเนินการ?"
+
+    - step: 2
+      action: "Confirm field pressure instrument reading at the specific isolation segment"
+      evidence_required: "Named pressure gauge tag number + current reading (psi or barg)"
+      ai_question: "เกจวัดความดันที่ติดอยู่กับส่วนที่ถูก isolate (ระบุ tag) อ่านได้ค่าเท่าไรขณะนี้? ใครเป็นผู้อ่านและเมื่อไร?"
+      critical_threshold: "Any reading above 0 psig (atmospheric) requires investigation before opening"
+      prohibited_inference: "Assume zero pressure from depressurization procedure completion alone"
+
+    - step: 3
+      action: "Confirm drain and vent confirmation"
+      evidence_required: >-
+        Drain valve confirmed open and flowing (free draining) to safe destination;
+        vent confirmed open to safe point.
+      ai_question: "Drain valve เปิดและไหลออกโดยอิสระหรือไม่? ไหลไปยังจุดใด (closed drain, bund, containment)? Vent เปิดไปยังจุดปลอดภัยหรือไม่?"
+      anomaly_indicators:
+        - "Drain valve does not flow freely — possible trapped pressure or frozen line"
+        - "Only small amount of liquid drains — possible hydraulic lock"
+        - "Drain makes hissing sound — gas still under pressure"
+
+    - step: 4
+      action: "Verify dead-legs and stagnant segments have been identified and addressed"
+      evidence_required: "P&ID trace confirming all dead-legs vented or drained separately"
+      ai_question: "มี dead-legs หรือ stagnant segments ในขอบเขต isolation ที่ต้องการ vent หรือ drain แยกต่างหากหรือไม่?"
+
+  stop_conditions:
+    - "Pressure gauge reads above zero → STOP_AND_ESCALATE (SES-06)"
+    - "Drain does not flow freely and pressure source is unknown → STOP_AND_ESCALATE"
+    - "Steam tracing or heat source exists on isolated liquid-full segment → CRITICAL_REVIEW (thermal expansion risk)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GATE 2: TEMPERATURE VERIFICATION
+# ─────────────────────────────────────────────────────────────────────────────
+gate_2_temperature_verification:
+  gate_id: "PCV-G2"
+  purpose: "Confirm process temperature is within safe range for personnel contact and opening"
+  prerequisite_for: "Any task requiring personnel contact with equipment surfaces or internal contents"
+
+  temperature_thresholds:
+    - condition: "Surface temperature > 60°C (140°F)"
+      risk: "Contact burns from external surface contact"
+      control: "Insulation, gloves, and access restriction until cooled"
+    - condition: "Fluid temperature > 60°C at point of break"
+      risk: "Scalding from residual hot fluid release on opening"
+      control: "Cooldown confirmation before opening"
+    - condition: "Cryogenic service (< -40°C)"
+      risk: "Cold burns, embrittlement of carbon steel, oxygen enrichment risk (LOX)"
+      control: "Cryogenic PPE; LOX-specific atmospheric monitoring; warm-up procedure confirmation"
+    - condition: "Auto-ignition temperature approach"
+      risk: "If material contacts oxygen above AIT, ignition without external source"
+      control: "Keep contents below AIT; N₂ blanket if approaching threshold"
+
+  verification_steps:
+    - step: 1
+      action: "Confirm equipment has cooled to safe temperature for opening"
+      evidence_required: "Thermocouple or surface thermometer reading (instrument ID + time)"
+      ai_question: "อุณหภูมิของอุปกรณ์และของเหลวในขณะนี้คือเท่าไร? ใครเป็นผู้วัดและด้วยเครื่องมืออะไร?"
+
+    - step: 2
+      action: "For cryogenic service, confirm warm-up procedure completed"
+      evidence_required: "Warm-up procedure reference + completion record"
+      ai_question: "สำหรับ cryogenic service: มีการ warm-up equipment ก่อนเปิดหรือไม่? อุณหภูมิถึงระดับ safe-to-open แล้วหรือยัง?"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GATE 3: CHEMICAL DECONTAMINATION VERIFICATION
+# ─────────────────────────────────────────────────────────────────────────────
+gate_3_decontamination_verification:
+  gate_id: "PCV-G3"
+  purpose: "Confirm chemical content has been removed or neutralized to safe level"
+  prerequisite_for: "Any task requiring entry into or opening of chemical-bearing equipment"
+
+  verification_methods:
+    - method: "Gas test (atmospheric monitoring)"
+      applicability: "Toxic gas and flammable vapor verification"
+      acceptance_criteria:
+        - "LFL = 0% (or below site-defined threshold, typically <1% for entry)"
+        - "H₂S < OSHA PEL (10 ppm; <1 ppm for some confined space entries)"
+        - "O₂ = 19.5–23.5%"
+        - "Other toxic gases below respective OEL/PEL"
+      instrument_requirements: "Calibrated multi-gas detector; bump-tested within 24h; calibration gases confirmed"
+      frequency: "Before entry; continuously during confined space work; after any interruption"
+
+    - method: "Analytical sampling"
+      applicability: "Liquid-phase residue, catalyst, sediment verification"
+      acceptance_criteria: "Site-defined concentration threshold per chemical"
+      instrument_requirements: "Approved analytical laboratory or field test kit"
+
+    - method: "Water-clear drain test"
+      applicability: "Water-miscible contamination screening (limited)"
+      limitation: "Cannot detect water-insoluble or water-immiscible contaminants; NOT sufficient alone for toxic service"
+
+    - method: "Nitrogen purge cycles"
+      applicability: "Flammable vapor displacement from enclosed equipment"
+      acceptance_criteria: "LFL = 0% after defined number of purge cycles"
+      limitation: "Creates oxygen-deficient atmosphere — must be followed by air purge and gas test before entry"
+
+  decontamination_stop_conditions:
+    - "Gas test shows LFL > 0% after claimed decontamination → Re-decontaminate and retest → RT-15"
+    - "Gas test shows H₂S > OEL after claimed decontamination → STOP_AND_ESCALATE (SES-01)"
+    - "Unknown residue found inside equipment → STOP_AND_ESCALATE (SES-01)"
+    - "FeS deposits observed on opening → STOP_AND_ESCALATE (SES-09)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GATE 4: ELECTRICAL ENERGY ISOLATION VERIFICATION
+# ─────────────────────────────────────────────────────────────────────────────
+gate_4_electrical_isolation:
+  gate_id: "PCV-G4"
+  purpose: "Confirm all electrical energy sources are isolated, locked, and tagged"
+  prerequisite_for: "Any work on or near energized electrical equipment or rotating machinery"
+
+  verification_steps:
+    - step: 1
+      action: "Identify all electrical energy sources"
+      evidence_required: "Single-line diagram or electrical drawing (current revision)"
+      ai_question: "มีแหล่งพลังงานไฟฟ้าทั้งหมดกี่แหล่งสำหรับอุปกรณ์นี้? รวม MCC, UPS, local disconnect, instrument power, heat tracing, space heaters หรือไม่?"
+      prohibited_inference: "Assume only one power source without drawing verification"
+
+    - step: 2
+      action: "Confirm isolation at appropriate point(s)"
+      evidence_required: "Lock(s) and tag(s) applied at each isolation point by each affected worker"
+      ai_question: "LOTO ถูกใช้งานที่ MCC/breaker ระดับใด? ผู้ปฏิบัติงานแต่ละคนล็อกด้วย padlock ของตัวเองหรือไม่?"
+
+    - step: 3
+      action: "Verify zero voltage at the point of work"
+      evidence_required: "Approved voltage tester reading = 0V at each conductor at the work location"
+      ai_question: "ยืนยันด้วยเครื่องมือวัดแรงดันที่ point-of-work แล้วหรือยัง? ใครเป็นผู้วัด? ผลการวัดคือเท่าไร?"
+      prohibited_inference: "Assume zero voltage because breaker appears open"
+
+    - step: 4
+      action: "Address backfeed, induced voltage, and stored energy (capacitors, UPS)"
+      evidence_required: "Confirmation that all sources including backfeed, control power, and stored energy are isolated"
+      ai_question: "มีความเป็นไปได้ของ backfeed จากระบบอื่น, induced voltage จากสายใกล้เคียง, หรือ capacitor/UPS energy หรือไม่?"
+
+  stop_conditions:
+    - "Voltage detected after LOTO declared → STOP_AND_ESCALATE"
+    - "Additional energy source identified not in isolation plan → STOP_AND_ESCALATE"
+    - "Auto-restart or remote-start not positively prevented → HIGH_REVIEW or STOP_AND_ESCALATE (SES-06 analog)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GATE 5: COMBINED ZERO-ENERGY STATE SUMMARY CHECKLIST
+# ─────────────────────────────────────────────────────────────────────────────
+gate_5_combined_zero_energy_summary:
+  gate_id: "PCV-G5"
+  purpose: "Final summary gate before opening any process equipment or boundary"
+  all_gates_must_pass_before: "Any process equipment is opened, entered, or disturbed"
+
+  checklist:
+    - item: "Positive physical isolation confirmed (Blind/Spade List referenced)"
+      evidence_label_required: "FACT — named source"
+    - item: "Field pressure gauge reads zero on isolated segment"
+      evidence_label_required: "FACT — gauge ID + reading + time + person"
+    - item: "Temperature within safe range for opening and personnel contact"
+      evidence_label_required: "FACT — instrument + reading"
+    - item: "Decontamination confirmed (gas test results documented)"
+      evidence_label_required: "FACT — gas test record"
+    - item: "Electrical isolation (LOTO) confirmed at point of work"
+      evidence_label_required: "FACT — LOTO record"
+    - item: "Relief path confirmed unblocked (if applicable)"
+      evidence_label_required: "FACT — CS-O record or P&ID marking"
+    - item: "Atmospheric monitoring active (confined space or toxic service)"
+      evidence_label_required: "FACT — monitor ID + calibration status"
+    - item: "Rescue capability confirmed (confined space only)"
+      evidence_label_required: "FACT — rescue team identified and present"
+
+  ai_behavior:
+    all_items_confirmed_fact: "Proceed to flag any remaining EVIDENCE_GAP or AI_HYPOTHESIS items. Issue READY_FOR_HUMAN_FIELD_REVIEW disposition."
+    any_item_evidence_gap_critical: "Issue STOP_AND_ESCALATE. List missing items. Do not proceed."
+    any_item_evidence_gap_material: "Issue ADDITIONAL_EVIDENCE_REQUIRED. List items. Continue only as AI_HYPOTHESIS."
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. 5 verification gates: pressure, temperature, decontamination, electrical LOTO, and combined zero-energy summary."

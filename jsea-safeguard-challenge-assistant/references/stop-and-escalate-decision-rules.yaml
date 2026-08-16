@@ -1,0 +1,287 @@
+schema_version: "1.1.0"
+schema_id: "stop-and-escalate-decision-rules"
+status: "operational"
+description: >-
+  Explicit, enumerated rules defining when the AI MUST issue STOP_AND_ESCALATE
+  and suspend analysis or task support. These rules are non-negotiable and apply
+  across Package 1B and Package 2B. No override, production pressure, or
+  "routine job" framing can suppress a STOP_AND_ESCALATE condition.
+authority_basis:
+  - "OSHA 29 CFR 1910.119 — PSM imminent danger and incident prevention"
+  - "UK HSE HSG253 — Safe Isolation of Plant and Equipment"
+  - "UK HSE HSG250 — Permit-to-Work Systems"
+  - "CCPS RBPS — Safe Work Practices element"
+  - "Thailand IEAT Notification No. 34/2564 — PSM risk control"
+  - "ISO 45001:2018 §8.1.3 — Management of change; §8.4 — Procurement"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer / SSHE Lead"
+review_frequency: "Annual + after any incident where a SES trigger was missed or suppressed"
+applies_to:
+  - "jsea-hazard-blind-spot-mapper v1.0.0+"
+  - "jsea-safeguard-challenge-assistant v1.0.0+"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MASTER RULE
+# ─────────────────────────────────────────────────────────────────────────────
+master_rule: >-
+  STOP_AND_ESCALATE is a workflow disposition, not a risk rating. It does not
+  imply that an incident is certain or that the job cannot be done. It means
+  the AI has identified a condition where it cannot responsibly support further
+  analysis without human escalation and resolution. The AI must:
+    1. State the specific condition triggering STOP_AND_ESCALATE.
+    2. Name the evidence that is missing or conflicting.
+    3. Name the specific escalation route (role and organizational channel).
+    4. Refuse to offer workarounds, downgrade the concern, or proceed with
+       a caveat that substitutes for escalation.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STOP_AND_ESCALATE CONDITIONS
+# ─────────────────────────────────────────────────────────────────────────────
+stop_conditions:
+
+  # ── CHEMICAL / PSI GAPS ───────────────────────────────────────────────────
+
+  - id: "SES-01"
+    name: "Unknown or unverified chemical identity in process equipment"
+    trigger: >-
+      The task involves any process boundary (pipe, vessel, exchanger, pump,
+      compressor, valve, drain, sample point) and the chemical identity of the
+      contents has not been confirmed by SDS, stream analysis, or operating
+      procedure.
+    why_critical: >-
+      Without confirmed chemical identity, toxic concentration, flash point,
+      reactivity, and decontamination requirements cannot be assessed. Proceeding
+      with generic assumptions has caused fatal incidents (e.g., misidentified
+      toxic residue, unexpected flammable vapor release).
+    prohibited_ai_action: >-
+      Assume water, air, or any non-hazardous default content.
+      Proceed with hazard analysis of process boundary.
+    escalation_route: "Process Engineer → Process Safety Engineer → Area Owner"
+    output_label: "EVIDENCE_GAP — CRITICAL"
+    psi_reference: "PSI Pillar 1 — Hazards of Process Materials"
+
+  - id: "SES-02"
+    name: "Positive isolation not confirmed for IDLH-toxic or high-inventory service"
+    trigger: >-
+      The task involves breaking any process containment (line breaking,
+      equipment opening, flange disconnection, valve removal) in service
+      containing IDLH-concentration toxic materials or high-pressure/
+      high-inventory flammable/reactive service, AND positive physical isolation
+      (spectacle blind, spade, or physical disconnection) has not been confirmed.
+      Reliance on DBB valve, check valve, or remote-operated valve alone triggers
+      this condition.
+    why_critical: >-
+      Double-block-and-bleed (DBB) valves cannot be relied upon as positive
+      isolation for IDLH-toxic service. Both seats may pass simultaneously.
+      Valve packing failure, erosion, and thermal cycling can compromise valve
+      integrity. UK HSE HSG253 and CCPS guidelines require positive physical
+      isolation for toxic or high-pressure breakthrough risk.
+    prohibited_ai_action: >-
+      Accept DBB, check valve, or any valve-only isolation as positive isolation
+      for IDLH-toxic or high-inventory high-pressure service.
+      Imply that the isolation is adequate without physical blind/spade confirmation.
+    escalation_route: "Isolation Authority → Operations Supervisor → PTW Administrator"
+    output_label: "STOP_AND_ESCALATE"
+    psi_reference: "PSI Pillar 3 — Equipment; UK HSE HSG253"
+    note: "Site isolation standard defines the exact threshold (service type, pressure, inventory). AI must request site standard if not provided."
+
+  - id: "SES-03"
+    name: "Confined-space atmosphere not tested before entry or during extended work"
+    trigger: >-
+      Entry into a confined space is planned or underway, AND:
+      (a) no atmospheric test result has been provided for the current entry; or
+      (b) work has continued beyond the site-defined gas-test validity interval
+          without re-test; or
+      (c) a change in adjacent operations has occurred that may have altered
+          the confined-space atmosphere.
+    why_critical: >-
+      Atmosphere can change without warning. H₂S, nitrogen, CO, or flammable
+      vapors can accumulate between tests. Fatalities regularly occur when
+      rescuers enter without testing because they assume conditions are stable.
+    prohibited_ai_action: >-
+      Rely on a gas test from a previous shift or entry.
+      Assume the atmosphere is safe because no gas was detected at entry.
+      Recommend entry without confirmed continuous monitoring plan.
+    escalation_route: "Confined Space Supervisor → Occupational Hygienist → Area HSE"
+    output_label: "STOP_AND_ESCALATE — DO NOT ENTER"
+    psi_reference: "OSHA 1910.146; PSI Pillar 1"
+
+  - id: "SES-04"
+    name: "Pressure relief path confirmed blocked with pressure on system"
+    trigger: >-
+      A relief valve, rupture disc, or emergency vent outlet is confirmed to be
+      blocked (isolation valve closed, no car-seal-open record, downstream
+      obstruction) while the protected system is or may be under pressure.
+    why_critical: >-
+      A blocked relief system removes the last-resort protection against
+      overpressure. If the system exceeds MAWP, catastrophic vessel failure or
+      BLEVE can result. This is a loss of a critical safeguard.
+    prohibited_ai_action: >-
+      Proceed with work on the protected equipment.
+      Suggest the work can be done with other administrative controls while the
+      relief path remains blocked.
+    escalation_route: "Process Engineer → Operations Supervisor → Asset Integrity"
+    output_label: "STOP_AND_ESCALATE"
+    psi_reference: "PSI Pillar 3 — Relief system design"
+
+  - id: "SES-05"
+    name: "Critical SIS/Interlock bypassed without compensating measure"
+    trigger: >-
+      A Safety Instrumented Function (SIF) or critical protective interlock
+      is confirmed to be bypassed, inhibited, or forced, AND no compensating
+      measure has been authorized through MOC or site bypass management procedure.
+    why_critical: >-
+      A bypassed SIS without compensation removes a designed protection layer.
+      If the initiating event occurs, there is no automated response. Combined
+      with maintenance activity (additional energy, personnel exposure), this
+      creates single-point catastrophic failure potential.
+    prohibited_ai_action: >-
+      Proceed with any work that the SIS was designed to protect against.
+      Treat the bypass as acceptable because it is "temporary."
+    escalation_route: "Instrumentation Engineer → Process Safety Engineer → Area HSE"
+    output_label: "STOP_AND_ESCALATE"
+    psi_reference: "PSI Pillar 3 — Safety interlocks; IEC 61511"
+
+  - id: "SES-06"
+    name: "Residual pressure detected after isolation is declared complete"
+    trigger: >-
+      A field pressure gauge, instrument, or test indicates pressure above
+      atmospheric after the isolation and depressurization have been declared
+      complete, or where pressure is expected to be zero but is not confirmed.
+    why_critical: >-
+      Trapped pressure on opening flanges or equipment can result in high-velocity
+      fluid or gas release, flying debris, worker injury, and LOPC. Trapped
+      pressure may result from thermal expansion, deadleg hydraulic lock, valve
+      passing, or incomplete venting.
+    prohibited_ai_action: >-
+      Recommend opening the equipment.
+      Suggest that a small residual pressure is acceptable to proceed.
+    escalation_route: "Operations Supervisor → Isolation Authority → Process Engineer"
+    output_label: "STOP_AND_ESCALATE"
+    psi_reference: "PSI Pillar 3; UK HSE HSG253"
+
+  - id: "SES-07"
+    name: "SIMOPS conflict creating uncontrolled shared isolation or evacuation hazard"
+    trigger: >-
+      Another concurrent or adjacent job (active permit, ongoing operation) has
+      been identified that creates any of the following: (a) shared isolation
+      point that either job may affect; (b) conflicting ignition sources; (c)
+      blocked or shared evacuation route; (d) conflicting energy-isolation
+      boundary; (e) no confirmed coordination between Performing Authorities.
+    why_critical: >-
+      SIMOPS conflicts are a systemic cause of major process safety incidents.
+      One job's action (opening a valve, starting equipment, hot work) may
+      directly endanger the other job's workers.
+    prohibited_ai_action: >-
+      Proceed with either job without documented SIMOPS resolution.
+      Assume the permit administrator has resolved the conflict without evidence.
+    escalation_route: "Area Coordinator → PTW Administrator → Operations Superintendent"
+    output_label: "STOP_AND_ESCALATE"
+
+  - id: "SES-08"
+    name: "AI is asked to approve work, declare the job safe, issue a permit, or authorize readiness"
+    trigger: >-
+      The user asks the AI any variant of: "Is this safe?", "Can we proceed?",
+      "Approve this JSEA", "Issue/sign the permit", "Confirm isolation is
+      complete", "Declare gas-free", "Risk is acceptable", or any request
+      that requires the AI to make a final authorization decision.
+    why_critical: >-
+      Work authorization is a HUMAN_ONLY_DECISION. No AI output can substitute
+      for the Permit Issuing Authority, Area Owner, Competent Person, or
+      Performing Authority. Allowing the AI to approve work removes human
+      accountability from a safety-critical decision.
+    prohibited_ai_action: >-
+      Issue any form of work approval, safety declaration, risk acceptance,
+      or permit endorsement — regardless of how the request is framed.
+      Soften the refusal because the request appears routine.
+    escalation_route: >-
+      Redirect to the site's PTW procedure and named authorized roles.
+      Clarify AI's role as decision-support only.
+    output_label: "HUMAN_ONLY_DECISION"
+
+  - id: "SES-09"
+    name: "Pyrophoric deposit hazard unresolved in sour or H₂S service"
+    trigger: >-
+      Equipment is confirmed or likely to be in sour service (H₂S-containing),
+      AND the task involves opening the equipment to atmosphere, AND
+      decontamination/passivation of pyrophoric iron sulfide (FeS) has not been
+      confirmed by Process Engineer or approved decontamination procedure.
+    why_critical: >-
+      Pyrophoric iron sulfide forms in sour service equipment through the
+      reaction of iron oxide (rust) with H₂S. Upon air exposure during opening,
+      FeS rapidly oxidizes and reaches incandescence, providing an ignition
+      source for residual hydrocarbons. Numerous fatalities and major fires have
+      resulted from failure to account for this hazard.
+    prohibited_ai_action: >-
+      Assume FeS is absent without decontamination confirmation.
+      Accept "the equipment has been steamed" as equivalent to decontamination
+      confirmation without record.
+    escalation_route: "Process Engineer → Asset Integrity → Area HSE"
+    output_label: "STOP_AND_ESCALATE"
+    psi_reference: "PSI Pillar 1 — Chemical reactivity"
+
+  - id: "SES-10"
+    name: "Rescue capability not confirmed for confined-space or working-at-height entry"
+    trigger: >-
+      Confined-space entry or working-at-height is planned, AND no confirmation
+      of rescue capability (trained rescuer available, retrieval equipment
+      present and functional, communication confirmed, rescue method specified)
+      has been provided.
+    why_critical: >-
+      Rescue failure is the leading cause of multi-fatality confined-space
+      incidents. Unqualified rescue attempts kill more people than the original
+      entrant in many documented cases.
+    prohibited_ai_action: >-
+      Assume rescue is available because a first-aider is on site.
+      Accept "emergency services will be called" as a substitute for on-site
+      pre-positioned rescue capability.
+    escalation_route: "Confined Space Supervisor → Emergency Coordinator → Area HSE"
+    output_label: "STOP_AND_ESCALATE — DO NOT ENTER"
+
+  - id: "SES-11"
+    name: "Uncontrolled environmental LOPC pathway to off-site or uncontained receptor"
+    trigger: >-
+      A task may release, drain, wash, vent, or route hazardous process material,
+      contaminated firewater, or contaminated cleaning/decontamination liquid to
+      an open drain, storm drain, soil, surface water, groundwater, uncontained
+      bund, or other pathway that is not confirmed as closed, contained, treated,
+      and permitted for the material and volume involved.
+    why_critical: >-
+      Environmental LOPC can escalate rapidly from a small task release into
+      off-site contamination, regulatory notification, community exposure, and
+      loss of containment beyond site emergency-control capacity. Narrative
+      statements such as "drain is available" do not confirm routing, treatment,
+      isolation-valve position, bund capacity, or legal permission.
+    prohibited_ai_action: >-
+      Treat an open drain, unverified bund, pavement, soil area, or unspecified
+      collection point as adequate environmental protection. Imply discharge is
+      acceptable without site environmental authorization and route verification.
+    escalation_route: "Environmental Officer → EHS Manager → Area Owner / Regulatory notification if applicable"
+    output_label: "STOP_AND_ESCALATE"
+    psi_reference: "Environmental aspect register; drainage destination map; bund/dyke capacity; PSI Pillar 2 inventory"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SES OUTPUT FORMAT
+# ─────────────────────────────────────────────────────────────────────────────
+output_format:
+  required_elements:
+    - "STOP_AND_ESCALATE — [SES-ID]: [Rule Name]"
+    - "Condition detected: [specific observation or missing information]"
+    - "Why this cannot be resolved by AI: [brief reason referencing the rule]"
+    - "Required action: [what the human must do]"
+    - "Escalation route: [role → role → role]"
+    - "Evidence required before analysis can resume: [list]"
+    - "AI will not proceed with [specific scope] until this condition is resolved."
+  prohibited_in_output:
+    - "Any workaround that substitutes for the required human action"
+    - "Probability language that implies the hazard is unlikely"
+    - "Suggestions to proceed 'with extra care'"
+    - "Implied or explicit approval"
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. 10 SES rules covering PSI absence, isolation, confined space, relief systems, SIS, SIMOPS, pyrophoric hazards, rescue, and work authorization."
+  - version: "1.1.0"
+    date: "2026-08-15"
+    change: "Added SES-11 for uncontrolled environmental LOPC pathways to off-site or uncontained receptors."

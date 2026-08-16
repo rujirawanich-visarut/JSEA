@@ -1,0 +1,69 @@
+schema_version: "1.0"
+catalog_id: "jsea-hazard-energy-catalog"
+status: "operational_working_catalog"
+usage_note: >-
+  Hazard-discovery prompts only. Site procedures, legal requirements, SDS,
+  manufacturer instructions, competent-person judgment, and field verification prevail.
+work_conditions:
+  - normal
+  - non_routine
+  - abnormal
+  - startup_shutdown
+  - maintenance_cleaning_blockage_clearing
+  - change_or_temporary_configuration
+  - emergency
+hazard_families:
+  - code: "HE-01"
+    name: "Mechanical and kinetic energy"
+    prompts: ["moving or rotating parts", "unexpected movement", "pinch/crush/shear", "ejected material", "mobile equipment", "dropped or swinging load", "line of fire"]
+  - code: "HE-02"
+    name: "Gravity and potential energy"
+    prompts: ["work at height", "falling person or object", "suspended load", "unstable stack", "slope or excavation", "stored elevation energy"]
+  - code: "HE-03"
+    name: "Pressure, vacuum and stored fluid energy"
+    prompts: ["pressurized line or vessel", "trapped pressure", "hydraulic or pneumatic accumulator", "vacuum collapse", "hose or connection failure", "jet release"]
+  - code: "HE-04"
+    name: "Electrical and electromagnetic energy"
+    prompts: ["live conductor", "induced or backfeed energy", "static electricity", "arc or fault energy", "damaged temporary power", "battery energy", "overhead or underground services"]
+  - code: "HE-05"
+    name: "Thermal and cryogenic energy"
+    prompts: ["hot surface or fluid", "steam", "cold surface or cryogenic material", "rapid temperature change", "heat stress or cold stress", "ignition source"]
+  - code: "HE-06"
+    name: "Chemical and process-material hazard"
+    prompts: ["toxic", "corrosive", "flammable", "reactive", "oxidizing", "asphyxiating", "sensitizing", "incompatible materials", "residue or contamination", "SDS uncertainty"]
+  - code: "HE-07"
+    name: "Fire, explosion and uncontrolled reaction"
+    prompts: ["fuel-oxidant-ignition interaction", "flammable atmosphere", "dust or vapor accumulation", "hot work", "runaway or incompatible reaction", "pressure escalation"]
+  - code: "HE-08"
+    name: "Atmospheric and confined-space hazard"
+    prompts: ["oxygen deficiency or enrichment", "toxic or flammable atmosphere", "restricted entry or exit", "poor ventilation", "engulfment", "rescue difficulty", "atmospheric change during work"]
+  - code: "HE-09"
+    name: "Radiation and optical energy"
+    prompts: ["ionizing source", "non-ionizing radiation", "laser", "ultraviolet or infrared", "welding arc", "radiofrequency or microwave"]
+  - code: "HE-10"
+    name: "Noise, vibration and pressure-wave exposure"
+    prompts: ["impulse or continuous noise", "hand-arm vibration", "whole-body vibration", "ultrasound", "blast or pressure wave", "communication masking"]
+  - code: "HE-11"
+    name: "Biological exposure"
+    prompts: ["microorganism", "bioaerosol", "sewage or waste", "animal/insect", "contaminated surface or water", "medical or first-aid exposure"]
+  - code: "HE-12"
+    name: "Ergonomic and manual-handling hazard"
+    prompts: ["force", "awkward posture", "repetition", "manual lift/carry/push/pull", "poor access", "tool design", "static work"]
+  - code: "HE-13"
+    name: "Human factors and psychosocial conditions"
+    prompts: ["fatigue", "time pressure", "workload", "competency or unfamiliar task", "communication or language", "distraction", "shift handover", "authority gradient", "lone work"]
+  - code: "HE-14"
+    name: "Access, egress and workplace condition"
+    prompts: ["slip/trip", "poor lighting", "restricted access", "housekeeping", "temporary platform or barrier", "traffic interface", "emergency egress"]
+  - code: "HE-15"
+    name: "Weather and natural-condition hazard"
+    prompts: ["lightning", "wind", "rain or flooding", "heat", "reduced visibility", "unstable ground", "wildlife", "natural disaster"]
+  - code: "HE-16"
+    name: "Control, automation and communication failure"
+    prompts: ["wrong indication", "alarm unavailable", "remote or automatic start", "software/configuration change", "loss of communication", "sensor failure", "temporary bypass"]
+  - code: "HE-17"
+    name: "Simultaneous operations and interface hazard"
+    prompts: ["conflicting jobs or permits", "shared isolation", "contractor interface", "vehicle-pedestrian interaction", "neighboring release", "handover gap", "area ownership ambiguity"]
+  - code: "HE-18"
+    name: "Emergency response and recovery hazard"
+    prompts: ["rescue assumption", "delayed alarm", "blocked access", "insufficient response capability", "secondary exposure to responders", "spill/fire escalation", "restoration after emergency"]

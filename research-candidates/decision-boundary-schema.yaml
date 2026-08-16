@@ -1,0 +1,90 @@
+schema_version: "1.0.0"
+candidate_id: "jsea-decision-boundary-a-through-g"
+status: "DRAFT_NOT_LOADED"
+runtime_loaded: false
+source_claims: ["SBD-CLM-011", "SBD-CLM-013", "SBD-CLM-014", "SBD-CLM-018", "SBD-CLM-021", "SBD-CLM-022"]
+classification_rule: "Classes are cumulative, not mutually exclusive. Use every class required to reach a defensible conclusion."
+closure_rule: "JSEA may raise an unresolved class or hold point; it cannot self-close classes C through G."
+
+required_fields:
+  - "decision_class"
+  - "question_or_proposition"
+  - "why_required"
+  - "required_input_or_evidence"
+  - "responsible_role"
+  - "current_status"
+  - "provenance"
+  - "downstream_decision"
+
+classes:
+  - class: "A"
+    name: "QUALITATIVE_AI_REASONING_PERMITTED"
+    purpose: "Generate and challenge bounded causal hypotheses using known principles and supplied facts."
+    permitted: ["physical-consistency check", "qualitative causal graph", "state-variable identification", "dependency challenge", "contradiction detection", "evidence question formulation"]
+    prohibited: ["numerical adequacy", "probability or residual-risk inference", "work or design approval"]
+    closure_authority: "JSEA may complete the qualitative reasoning step, subject to review."
+  - class: "B"
+    name: "EVIDENCE_RETRIEVAL_REQUIRED"
+    purpose: "Retrieve exact properties, standards, approved design basis, manufacturer information, incident evidence or model scope."
+    required_input: "Direct, versioned and applicable source with scope and provenance."
+    prohibited: ["source invention", "opaque citation as evidence", "cross-jurisdiction legal conflation"]
+    closure_authority: "Evidence owner or reviewer confirms applicability."
+  - class: "C"
+    name: "SITE_OR_EQUIPMENT_DATA_REQUIRED"
+    purpose: "Obtain actual composition, inventory, geometry, topology, settings, material, current condition, occupancy or procedure."
+    required_input: "Current site-controlled record, observation or responsible-person confirmation."
+    prohibited: ["replace missing fact with a nominal value", "assume drawing equals field state"]
+    closure_authority: "Designated site data owner."
+  - class: "D"
+    name: "SPECIALIST_CALCULATION_OR_SIMULATION_REQUIRED"
+    purpose: "Perform quantitative thermodynamics, kinetics, relief, dispersion, fire/explosion, exposure, FFS, reliability, SIL or LOPA analysis."
+    required_input: "Approved method, applicable model, validated inputs, uncertainty treatment and competent analyst."
+    prohibited: ["LLM-generated engineering number", "calculation from narrative-only inputs", "model selection without applicability review"]
+    closure_authority: "Competent discipline specialist."
+  - class: "E"
+    name: "PHYSICAL_TEST_INSPECTION_OR_MEASUREMENT_REQUIRED"
+    purpose: "Resolve questions that only observation, testing, inspection, sampling or measurement can establish."
+    required_input: "Approved method, calibrated or qualified means, traceable result and stated conditions."
+    prohibited: ["infer field state from plausibility", "treat absence of an alarm as proof of absence"]
+    closure_authority: "Authorized test, inspection or operations role."
+  - class: "F"
+    name: "COMPETENT_PERSON_INTERPRETATION_REQUIRED"
+    purpose: "Select models, judge applicability, accept assumptions, define limits, resolve conflicting evidence or make a technical disposition."
+    required_input: "Evidence package and the competence appropriate to the discipline and jurisdiction."
+    prohibited: ["AI declares engineering adequacy", "AI resolves conflicting evidence silently", "AI determines legal applicability"]
+    closure_authority: "Named competent person or multidisciplinary review process."
+  - class: "G"
+    name: "HUMAN_ONLY_AUTHORIZATION_OR_RISK_ACCEPTANCE"
+    purpose: "Approve permits, MOC, designs, continued operation, safeguard credit, SIL, relief adequacy, FFS disposition, legal determination or residual risk."
+    required_input: "Completed prerequisites plus the site's defined governance and accountable authority."
+    prohibited: ["AI approval", "auto-close hold point", "generated prose overrides a permit or engineering gate"]
+    closure_authority: "Named human authority only."
+
+compound_routing_examples:
+  - topic: "Unknown reactive mixture and exact emergency relief capacity"
+    classes: ["A", "B", "C", "D", "E", "F", "G"]
+    rationale: "Qualitative mechanism recognition is possible, but chemistry, site state, testing, calculation, interpretation and acceptance remain external."
+  - topic: "Two shutdown actions share one transmitter"
+    classes: ["A", "B", "C", "F", "G"]
+    rationale: "JSEA can identify a common dependency; actual architecture, method applicability and any protection credit require evidence and human decision."
+  - topic: "Field line-up conflicts with the latest P&ID"
+    classes: ["A", "C", "E", "F", "G"]
+    rationale: "Preserve the conflict until field verification and competent reconciliation; do not authorize work from either record alone."
+  - topic: "Known property requested for a covered pure fluid"
+    classes: ["A", "B", "C", "F"]
+    rationale: "Retrieve the property and confirm substance, state and applicability before use in a consequential conclusion."
+
+hold_point_triggers:
+  - "A safety-significant site fact required by a causal path is unknown."
+  - "Critical evidence conflicts or is stale."
+  - "A required calculation, test, inspection or measurement is missing."
+  - "Safeguard state, timing, dependency or lifecycle evidence is unresolved."
+  - "Competent interpretation, legal applicability or authorization is pending."
+
+promotion_gate:
+  required:
+    - "All 17 candidate scenarios pass boundary-compliance review."
+    - "Human reviewers agree on class assignment for representative cases."
+    - "Runtime implementation cannot bypass F or G through generated prose."
+    - "FIELD_JSA output remains concise and maps unresolved classes to hold points and responsible roles."
+

@@ -1,0 +1,131 @@
+schema_version: "1.3.0"
+package_id: "jsea-hazard-blind-spot-mapper"
+package_version: "1.3.0"
+created_date: "2026-08-15"
+classification: "Operational Knowledge Framework — 5-Tier Hierarchy"
+description: >-
+  Master Authoritative Source Register for JSEA Hazard Blind-Spot Mapper.
+  Structures all reference knowledge into a strict 5-tier authoritative precedence
+  hierarchy, ensuring that site-approved engineering documents and local legal mandates
+  prevail over generic guidance.
+
+source_hierarchy_rules:
+  - "Tier 1 (Site Authoritative) and Tier 2 (Legal & Regulatory) ALWAYS override international standards and vendor guides."
+  - "Tier 5 (Web/AI) sources are strictly orientation tools and MUST NOT be cited to approve or justify safety controls."
+  - "When regulatory jurisdictions conflict, the local jurisdiction where the plant operates prevails."
+
+tiers:
+  tier_1_site_authoritative:
+    precedence: 1
+    binding_status: "MANDATORY"
+    sources:
+      - id: "SRC-T1-01"
+        title: "Site Approved JSEA / JHA / JSA Procedure & Worksheet"
+        authority_level: "PRIMARY_SITE_GOVERNANCE"
+        use: "Defines task step structure, hazard recording format, worker participation rules, and sign-off hierarchy."
+      - id: "SRC-T1-02"
+        title: "Permit to Work (PTW) & Isolation / LOTO Standards"
+        authority_level: "PRIMARY_SITE_GOVERNANCE"
+        use: "Establishes positive isolation boundaries, line breaking permits, hot work certificates, and role authorizations."
+      - id: "SRC-T1-03"
+        title: "Process Safety Information (PSI) Package (P&IDs, SOLs, PFDs, C&E Diagrams)"
+        authority_level: "TECHNICAL_BEDROCK"
+        use: "Verified engineering baseline for process boundaries, safe operating limits, relief routing, and interlock status."
+      - id: "SRC-T1-04"
+        title: "Site Chemical SDS Database & Laboratory Stream Analyses"
+        authority_level: "CHEMICAL_BASELINE"
+        use: "Trace chemical identification, composition, toxic endpoints, and compatibility data."
+      - id: "SRC-T1-05"
+        title: "Unit PHA / HAZOP Register & Active MOC / Bypass Registers"
+        authority_level: "RISK_MEMORY"
+        use: "Identified scenario history, active temporary deviations, and unclosed safety action items."
+
+  tier_2_legal_and_regulatory:
+    precedence: 2
+    binding_status: "LEGAL_COMPLIANCE"
+    sources:
+      - id: "SRC-T2-01"
+        title: "Thailand Hazardous Substance Act B.E. 2535 (and amendments)"
+        jurisdiction: "Thailand (DIW / IEAT / FDA)"
+        use: "Hazardous substance classification (Types 1-4), possession licensing, and statutory reporting thresholds."
+      - id: "SRC-T2-02"
+        title: "IEAT Notification No. 34/2564: Process Safety Management (PSM)"
+        jurisdiction: "Thailand (Industrial Estate Authority of Thailand)"
+        use: "Mandatory PSM elements for industrial estate chemical facilities, including PSI, PHA, MOC, and PSSR."
+      - id: "SRC-T2-03"
+        title: "Thailand Factory Act B.E. 2535 & Ministerial Regulations"
+        jurisdiction: "Thailand (Department of Industrial Works)"
+        use: "Industrial wastewater, emission limits, chemical storage distances, and factory safety licensing."
+      - id: "SRC-T2-04"
+        title: "Thailand OSH Act B.E. 2554 & Confined Space / Hot Work Decrees"
+        jurisdiction: "Thailand (Department of Labour Protection and Welfare)"
+        use: "Mandatory safety officer roles, confined space entry authorizations, and worker safety rights."
+      - id: "SRC-T2-05"
+        title: "OSHA 29 CFR 1910.119 (PSM for Highly Hazardous Chemicals)"
+        jurisdiction: "USA / International Benchmark"
+        use: "Baseline engineering standard for the 3 PSI pillars, mechanical integrity, and safe work practices."
+
+  tier_3_international_standards:
+    precedence: 3
+    binding_status: "RECOGNIZED_GOOD_PRACTICE"
+    sources:
+      - id: "SRC-T3-01"
+        title: "CCPS Risk-Based Process Safety (RBPS)"
+        publisher: "AIChE Center for Chemical Process Safety"
+        use: "20-element process safety framework, asset integrity, and operational discipline."
+      - id: "SRC-T3-02"
+        title: "UK HSE HSG253: The Safe Isolation of Plant and Equipment"
+        publisher: "UK Health and Safety Executive"
+        use: "Isolation hierarchy (positive physical isolation > DBB > single block), bleed proving, and line-breaking gates."
+      - id: "SRC-T3-03"
+        title: "ISO 45001:2018 (OH&S) & ISO 14001:2026 (EMS)"
+        publisher: "International Organization for Standardization"
+        use: "Systemic hazard identification, environmental aspect-impact pathways, and continual improvement."
+      - id: "SRC-T3-04"
+        title: "IEC 61511: Functional Safety — Safety Instrumented Systems"
+        publisher: "International Electrotechnical Commission"
+        use: "Safety integrity levels (SIL), sensor redundancy, bypass management, and common-cause failure prevention."
+      - id: "SRC-T3-05"
+        title: "API RP 750 / API 510 / API 570 / API 653"
+        publisher: "American Petroleum Institute"
+        use: "Pressure equipment inspection cycles, remaining wall thickness calculation, and process hazard management."
+
+  tier_4_manufacturer_and_vendor:
+    precedence: 4
+    binding_status: "EQUIPMENT_SPECIFIC"
+    sources:
+      - id: "SRC-T4-01"
+        title: "Manufacturer Equipment Operating & Maintenance Manuals (O&M)"
+        use: "Design limits, torque specifications, approved cleaning solvents, and specific disassembly sequences."
+      - id: "SRC-T4-02"
+        title: "Gas Detector & Instrument Calibration Sheets"
+        use: "Sensor cross-sensitivity data, calibration gas specifications, and response time limits."
+
+  tier_5_orientation_and_web:
+    precedence: 5
+    binding_status: "NON_AUTHORITATIVE"
+    sources:
+      - id: "SRC-T5-01"
+        title: "General Engineering Literature & Public Safety Bulletins"
+        use: "Weak-signal discovery and prompt formulation only; never used to approve controls."
+
+control_requirements:
+  - "Use current local law, site JSEA/PTW procedure, SDS, manufacturer instructions, and approved standards."
+  - "Workers familiar with the task must participate in JSEA review."
+  - "Only authorized site roles may approve controls, permits, risk ratings, and work readiness."
+  - "Perform field verification; AI output cannot confirm actual conditions, isolation, atmosphere, equipment integrity, or emergency readiness."
+  - "Use Stop Work Authority and escalation when conditions are unknown, changed, or unsafe."
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial Package 1B for JSEA hazard and environmental blind-spot mapping."
+  - version: "1.1.0"
+    date: "2026-08-15"
+    change: "Integrated 5-Tier Authoritative Source Hierarchy, PSI knowledge baseline, and Thailand DIW/IEAT regulations."
+  - version: "1.2.0"
+    date: "2026-08-15"
+    change: "Added reference loading contract and aligned environmental LOPC escalation with SES-11."
+  - version: "1.3.0"
+    date: "2026-08-15"
+    change: "Added audience-aware field communication profiles and behavior evaluations."

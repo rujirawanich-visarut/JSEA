@@ -1,0 +1,106 @@
+schema_version: "1.3.0"
+package_id: "jsea-safeguard-challenge-assistant"
+package_version: "1.3.0"
+created_date: "2026-08-15"
+classification: "Operational Safeguard Verification Framework — 5-Tier Hierarchy"
+description: >-
+  Authoritative Source Register for JSEA Safeguard Challenge Assistant.
+  Structures review criteria, safeguard challenge logic, and evidence validation rules
+  into a strict 5-tier authoritative precedence hierarchy.
+
+source_hierarchy_rules:
+  - "Site-approved procedures and engineering records (Tier 1) prevail over all AI challenge suggestions."
+  - "Legal standards (Tier 2) and Recognized Good Practices (Tier 3) define the minimum baseline for safeguard adequacy."
+  - "AI must never accept administrative instructions or PPE as sole barriers when Tier 1-3 sources require engineering isolation."
+
+tiers:
+  tier_1_site_authoritative:
+    precedence: 1
+    binding_status: "MANDATORY"
+    sources:
+      - id: "SGC-T1-01"
+        title: "Site Approved JSEA / JSA / PTW Governance Standard"
+        authority_level: "PRIMARY_SITE_GOVERNANCE"
+        use: "Defines permitted work authorization roles, field verification workflows, and residual risk acceptance rules."
+      - id: "SGC-T1-02"
+        title: "Site Isolation and Energy Control (LOTO) Procedure"
+        authority_level: "PRIMARY_SITE_GOVERNANCE"
+        use: "Mandatory positive isolation standards (DBB vs spectacle blind) for hazardous chemical and pressure boundaries."
+      - id: "SGC-T1-03"
+        title: "Approved Process Safety Information (P&IDs, SOLs, Cause & Effect Diagrams, Relief Design)"
+        authority_level: "TECHNICAL_BEDROCK"
+        use: "Validates safeguard independence, relief valve routing, SIS bypass status, and zero-energy verification points."
+      - id: "SGC-T1-04"
+        title: "Site Chemical SDS, Laboratory Stream Tables, and Metallurgy Line Specs"
+        authority_level: "TECHNICAL_BEDROCK"
+        use: "Substance compatibility, chemical resistance of gaskets/seals, and toxic exposure thresholds."
+
+  tier_2_legal_and_regulatory:
+    precedence: 2
+    binding_status: "LEGAL_COMPLIANCE"
+    sources:
+      - id: "SGC-T2-01"
+        title: "IEAT Notification No. 34/2564 & Thailand DIW Hazardous Substance Regulations"
+        jurisdiction: "Thailand (IEAT / DIW)"
+        use: "Statutory requirements for process safety management, secondary containment, and major accident prevention."
+      - id: "SGC-T2-02"
+        title: "Thailand Occupational Safety, Health and Environment Act B.E. 2554"
+        jurisdiction: "Thailand (DLPW)"
+        use: "Statutory duty of care, safety officer verification, and stop-work obligations."
+      - id: "SGC-T2-03"
+        title: "OSHA 29 CFR 1910.119 (PSM)"
+        jurisdiction: "USA / International Benchmark"
+        use: "Process safety information integrity, mechanical integrity verification, and management of change (MOC)."
+
+  tier_3_recognized_good_practice:
+    precedence: 3
+    binding_status: "RECOGNIZED_GOOD_PRACTICE"
+    sources:
+      - id: "SGC-T3-01"
+        title: "UK HSE HSG253: Safe Isolation of Plant and Equipment"
+        publisher: "UK Health and Safety Executive"
+        use: "Baseline isolation hierarchy: Positive Physical Isolation > Double Block and Bleed > Single Valve."
+      - id: "SGC-T3-02"
+        title: "IEC 61511: Functional Safety for the Process Industry"
+        publisher: "International Electrotechnical Commission"
+        use: "Independence of protection layers (IPL), sensor redundancy, and bypass management."
+      - id: "SGC-T3-03"
+        title: "CCPS Guidelines for Safe Automation of Chemical Processes & Inherently Safer Chemical Processes"
+        publisher: "AIChE Center for Chemical Process Safety"
+        use: "Elimination/substitution before engineering controls; defense-in-depth principles."
+
+  tier_4_equipment_and_vendor:
+    precedence: 4
+    binding_status: "EQUIPMENT_SPECIFIC"
+    sources:
+      - id: "SGC-T4-01"
+        title: "Vendor Technical Manuals, Calibration Certs, and Chemical Compatibility Charts"
+        use: "Component operating envelopes, proof test intervals, and material compatibility limits."
+
+  tier_5_orientation_literature:
+    precedence: 5
+    binding_status: "NON_AUTHORITATIVE"
+    sources:
+      - id: "SGC-T5-01"
+        title: "General Engineering Publications and Case Studies"
+        use: "Inspiration for challenge questions only; never cited as authorization to proceed."
+
+content_classification:
+  official_site_requirement: "Mandatory condition established by approved site standard."
+  curated_pattern: "Structured challenge pattern from package references requiring competent-person verification."
+  ai_hypothesis: "Potential safeguard vulnerability flagged for human engineering review."
+  human_only_decision: "Permit issuance, risk score sign-off, isolation confirmation, and work authorization."
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial Package 2B for JSEA safeguard challenge decision support."
+  - version: "1.1.0"
+    date: "2026-08-15"
+    change: "Upgraded to 5-Tier Authoritative Source Hierarchy aligned with PSI and process safety governance."
+  - version: "1.2.0"
+    date: "2026-08-15"
+    change: "Added reference loading contract and aligned environmental LOPC escalation with SES-11."
+  - version: "1.3.0"
+    date: "2026-08-15"
+    change: "Added audience-aware field communication profiles and behavior evaluations."

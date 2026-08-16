@@ -1,0 +1,249 @@
+schema_version: "1.0.0"
+schema_id: "process-safeguard-challenge-extension"
+status: "operational"
+description: >-
+  Extension challenge patterns for JSEA safeguard review in chemical and
+  petrochemical process facilities. Supplements hierarchy-of-controls-patterns.yaml
+  with process-specific safeguard challenges covering: LOPC prevention,
+  relief system integrity, SIS adequacy, drain/vent routing, hazardous area
+  controls, and environmental emergency containment.
+  These patterns address the gap where generic safeguard challenge does not
+  reach the process-engineering-layer hazard mechanisms.
+authority_basis:
+  - "OSHA 29 CFR 1910.119 — Process Safety Management (PSM)"
+  - "IEC 61511:2016 — Functional Safety / Safety Instrumented Systems"
+  - "CCPS RBPS — Asset integrity and reliability; Safe work practices"
+  - "UK HSE HSG250 — Permit-to-Work guidance"
+  - "API RP 750 — Management of process hazards"
+  - "NFPA 30 — Flammable and combustible liquids code"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer"
+review_frequency: "Annual + after any process-safety-related incident"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DOMAIN 1: LOPC PREVENTION AND CONTAINMENT
+# ─────────────────────────────────────────────────────────────────────────────
+lopc_prevention_challenges:
+
+  - id: "PSCE-01"
+    domain: "LOPC Prevention"
+    name: "process_containment_safeguard_vs_ppe_only"
+    signal: >-
+      For a task involving process boundary (line breaking, equipment opening,
+      sampling, draining), the only safeguards listed are PPE (chemical suit,
+      SCBA, face shield) and administrative controls (safe isolation procedure).
+    challenge: >-
+      PPE and procedures do not prevent LOPC — they only affect consequence if
+      containment fails. For IDLH-toxic, high-pressure, or high-inventory
+      service, challenge: Has positive physical isolation been confirmed as
+      the prevention barrier? Is a spill containment system (bunded area,
+      portable bund) in place? Where will any release drain?
+    hierarchy_required: "Engineering (positive isolation, containment) before PPE"
+    evidence_required:
+      - "Positive isolation certificate with Blind/Spade List reference"
+      - "Spill containment arrangement at work location"
+      - "Drain destination confirmation (closed drain vs. open drain vs. bunded area)"
+    prohibited_ai_response: "Accept PPE as the primary safeguard for LOPC prevention in process service"
+
+  - id: "PSCE-02"
+    domain: "LOPC Prevention"
+    name: "drain_to_open_drain_from_toxic_or_flammable_service"
+    signal: >-
+      JSEA or permit specifies draining equipment or piping to an open drain,
+      surface drain, sewer, or unspecified drain, and the drained material is
+      toxic, flammable, corrosive, or environmentally harmful.
+    challenge: >-
+      Open drain routing of process materials is an environmental and safety
+      hazard. Challenge: Does the open drain route to a closed treatment system
+      (closed drain header, sump, API separator)? Is the material type and
+      volume compatible with the treatment system capacity? Is there an
+      environmental permit or consent for this discharge? Who is responsible
+      for monitoring the drain point?
+    evidence_required:
+      - "Drain destination map or P&ID drain routing"
+      - "Environmental aspect register entry for this activity"
+      - "Bund/dyke capacity if secondary containment is relied upon"
+    stop_condition: "If drain routes directly to surface water, soil, storm drain, or uncontained bund without confirmed treatment/containment authorization → STOP_AND_ESCALATE (SES-11)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DOMAIN 2: RELIEF SYSTEM INTEGRITY AS SAFEGUARD
+# ─────────────────────────────────────────────────────────────────────────────
+relief_system_challenges:
+
+  - id: "PSCE-03"
+    domain: "Relief System"
+    name: "relief_device_as_safeguard_not_verified"
+    signal: >-
+      JSEA or hazard register credits a pressure relief valve (PRV), rupture
+      disc, or safety valve as a safeguard against overpressure, but no
+      evidence of its current status, routing, or last test date is provided.
+    challenge: >-
+      A relief device is only a safeguard if it is functional, correctly sized,
+      and its outlet path is unobstructed. Challenge: Is the relief device in
+      service (not blanked, not removed, not overdue for inspection)? Does the
+      outlet route to a safe destination (flare, closed header, scrubber) and
+      is that path confirmed unblocked (car-seal-open)? What is the last
+      proof-test or inspection date?
+    evidence_required:
+      - "Relief device inspection or test record"
+      - "Car-seal-open record for isolation valve on relief outlet line"
+      - "Flare/header pressure status (is the flare system operational?)"
+    prohibited_ai_response: "Assume a relief device is functional because it is shown on P&ID"
+    stop_condition: "If relief path confirmed blocked → STOP_AND_ESCALATE (SES-04)"
+
+  - id: "PSCE-04"
+    domain: "Relief System"
+    name: "rupture_disc_upstream_of_relief_valve_not_confirmed_intact"
+    signal: "P&ID or description shows a rupture disc upstream of a relief valve."
+    challenge: >-
+      A failed (ruptured or pinhole-leaked) disc upstream of the relief valve
+      may backpressure or corrode the relief valve, rendering both ineffective.
+      Challenge: Is there a pressure indicator between the disc and valve to
+      detect disc failure? When was the rupture disc last inspected or replaced?
+    evidence_required:
+      - "PI/indicator between disc and valve"
+      - "Rupture disc inspection or replacement record"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DOMAIN 3: SIS / INTERLOCK / ALARM ADEQUACY
+# ─────────────────────────────────────────────────────────────────────────────
+sis_challenges:
+
+  - id: "PSCE-05"
+    domain: "SIS / Interlock"
+    name: "alarm_only_as_prevention_for_critical_process_deviation"
+    signal: >-
+      Safeguard for a critical process deviation (high pressure, high temperature,
+      level breach) relies only on an alarm with operator response, with no
+      automatic shutdown or trip.
+    challenge: >-
+      An alarm requires a human to detect, interpret, and act correctly within
+      the required response time. Challenge: Has the response time been
+      validated? Is the operator always present? Is there a backup alarm?
+      Has the scenario been covered in a LOPA or SIL study? Has the alarm
+      been confirmed active and not in inhibit?
+    evidence_required:
+      - "LOPA or SIL study outcome if safety-critical scenario"
+      - "Alarm proof-test record"
+      - "Bypass/Inhibit register status for this alarm"
+    prohibited_ai_response: "Treat alarm + manual response as equivalent to an automated SIS for safety-critical scenarios"
+
+  - id: "PSCE-06"
+    domain: "SIS / Interlock"
+    name: "remote_start_or_auto_restart_not_addressed"
+    signal: >-
+      Work is being performed on or near rotating equipment (pump, compressor,
+      fan, agitator) or in an area where remotely started equipment could
+      create a hazard, and the JSEA does not address remote start or
+      auto-restart prevention.
+    challenge: >-
+      Remote start or auto-restart is a known cause of fatalities during
+      maintenance. Challenge: Has the energy been isolated (LOTO) at the
+      MCC/breaker level? Has control-room confirmation been obtained that
+      no remote-start command will be issued? Is there a permissive interlock
+      that will be de-energized? Is an operator stationed at the isolation point?
+    evidence_required:
+      - "LOTO at MCC/breaker with lock and tag"
+      - "Control room written confirmation (SIMOPS log or permit endorsement)"
+      - "Cause & Effect diagram if permissive interlock is involved"
+    stop_condition: "If remote start cannot be positively prevented (LOTO not applied) → HIGH_REVIEW or STOP_AND_ESCALATE"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DOMAIN 4: HAZARDOUS AREA / IGNITION SOURCE CONTROL
+# ─────────────────────────────────────────────────────────────────────────────
+hazardous_area_challenges:
+
+  - id: "PSCE-07"
+    domain: "Hazardous Area"
+    name: "ignition_source_control_in_classified_area"
+    signal: >-
+      Task involves electrical equipment, hot work, or tools with potential to
+      produce sparks/arcs in an area where flammable materials are handled or
+      stored (process area, chemical storage, pump hall, compressor house).
+    challenge: >-
+      The adequacy of ignition-source control depends on the confirmed
+      electrical area classification. Challenge: What is the confirmed
+      electrical area classification (Zone 0/1/2 or Class I Div 1/2) at the
+      work location per the approved classification drawing? Do all electrical
+      tools, temporary power, communication devices, and lighting meet
+      the Ex-rating for that zone? Has the hot-work gas test been performed
+      in the last [site-defined interval] and is gas-free confirmed?
+    evidence_required:
+      - "Hazardous Area Classification Drawing (current approved revision)"
+      - "Ex-certificate (ATEX or IECEx) for each piece of electrical equipment"
+      - "Hot-work gas test record (within site-defined validity period)"
+      - "Hot Work Permit if applicable"
+    prohibited_ai_response: >-
+      Assume that electrical equipment is suitable for a classified area without
+      Ex-certification confirmation.
+      Assume a zone is non-classified without Classification Drawing reference.
+
+  - id: "PSCE-08"
+    domain: "Hazardous Area"
+    name: "static_electricity_and_earthing_for_flammable_liquid_transfer"
+    signal: "Task involves transfer, loading, unloading, or sampling of flammable liquids."
+    challenge: >-
+      Static charge accumulation during flammable liquid transfer can produce
+      incendive sparks. Challenge: Has earthing/bonding been verified between
+      source and receiving vessel? Is the transfer rate within the charging-rate
+      limit for the pipe size and liquid resistivity? Is non-sparking tooling
+      being used? Is there a no-flow (initial wetting) period applied?
+    evidence_required:
+      - "Earthing/bonding verification record"
+      - "Site procedure for flammable liquid transfer"
+    prohibited_ai_response: "Assume earthing is established without field verification"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DOMAIN 5: ENVIRONMENTAL EMERGENCY CONTAINMENT AS SAFEGUARD
+# ─────────────────────────────────────────────────────────────────────────────
+environmental_challenges:
+
+  - id: "PSCE-09"
+    domain: "Environmental Containment"
+    name: "bund_or_dyke_capacity_not_confirmed"
+    signal: >-
+      JSEA credits a bund, dyke, or secondary containment area as the
+      environmental safeguard for a spill or LOPC, but bund capacity,
+      condition, or drain-valve status is not confirmed.
+    challenge: >-
+      Secondary containment is only effective if it can hold the maximum
+      credible release volume. Challenge: What is the confirmed bund/dyke
+      capacity? Is it free of accumulated water or debris that would reduce
+      effective volume? Is the drain valve in the bund confirmed closed and
+      locked (car-seal-closed)? Does the capacity exceed the maximum
+      inventory of the largest tank or vessel within the bund?
+    evidence_required:
+      - "Bund/dyke capacity record"
+      - "Bund drain valve car-seal-closed status"
+      - "Last inspection record for bund integrity"
+
+  - id: "PSCE-10"
+    domain: "Environmental Containment"
+    name: "firewater_runoff_containment_not_addressed_for_toxic_chemical"
+    signal: >-
+      Emergency response plan or firefighting safeguard is cited for a
+      toxic chemical release scenario, but firewater runoff management is
+      not addressed.
+    challenge: >-
+      Firewater applied to a toxic chemical spill can create a large-volume
+      contaminated runoff that exceeds bund capacity or routes to surface
+      water or drains. Challenge: Has the firewater runoff volume and routing
+      been assessed? Can the drain system or bund contain the combined
+      volume of spill + firewater? Are stormwater and contaminated-water
+      isolation valves available and identified in the ERP?
+    evidence_required:
+      - "ERP section on firewater management"
+      - "Drain isolation valve locations"
+      - "Bund capacity vs. firewater application rate calculation"
+
+prohibited_inferences:
+  - "A safety safeguard exists and functions because it appears on a P&ID or in a procedure document"
+  - "Administrative controls or PPE can compensate for absent engineering isolation in process boundary work"
+  - "Relief device is functional without inspection and path-continuity evidence"
+  - "Alarm response is equivalent to automated SIS for safety-critical process deviations"
+  - "Bund/dyke will contain a maximum-credible release without capacity and condition confirmation"
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. 10 process-specific challenge patterns covering LOPC, relief systems, SIS, hazardous area, and environmental emergency containment."

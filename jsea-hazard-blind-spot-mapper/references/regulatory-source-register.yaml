@@ -1,0 +1,278 @@
+schema_version: "1.0.0"
+schema_id: "regulatory-source-register"
+status: "operational"
+description: >-
+  Authoritative source register for legal, regulatory, and recognized-good-practice
+  references applicable to JSEA in chemical and petrochemical facilities.
+  Organized into 5 tiers per the evidence-aware architecture research roadmap.
+  Covers Thailand primary jurisdiction plus international references.
+  AI must not cite standards as applicable to a specific facility without
+  confirming: (a) facility jurisdiction, (b) chemical scope, and (c) current
+  effective date of the regulation.
+authority_note: >-
+  Thai law governs Thai facilities. International standards are reference
+  and recognized good practice. Where Thai law is silent, international
+  standards may inform design but do not override Thai regulatory requirements.
+  Site Legal/Compliance must confirm current applicable law before reliance.
+created_date: "2026-08-15"
+update_owner: "SSHE Lead / Legal & Compliance"
+review_frequency: "Annual + after any regulatory change notification"
+access_date: "2026-08-15"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 1 — ORGANIZATION AND SITE AUTHORITATIVE SOURCES
+# (Defined by each organization — not enumerable here; schema only)
+# ─────────────────────────────────────────────────────────────────────────────
+tier_1_organization_schema:
+  description: "Site-approved documents that override all other tiers for site-specific decisions."
+  document_categories:
+    - "JSEA/JSA/JHA Procedure (approved revision)"
+    - "Permit-to-Work Procedure"
+    - "Isolation and LOTO Standard"
+    - "Confined Space Entry Procedure"
+    - "Hot Work Permit Procedure"
+    - "Line Breaking and Equipment Opening Procedure"
+    - "Safe Operating Limits (SOL) Sheets"
+    - "Process Safety Information Package (PSI)"
+    - "PHA/HAZOP Register + Open Recommendations"
+    - "MOC Register"
+    - "Bypass/Inhibit/Impairment Register"
+    - "Emergency Response Plan (ERP)"
+    - "Hazardous Area Classification Drawings"
+    - "Environmental Aspect Register"
+    - "Incident and Near-Miss Database"
+  ai_rule: >-
+    When a Tier 1 document is named by the user, treat its content as FACT.
+    When a Tier 1 document is referenced but not provided, classify as
+    EVIDENCE_GAP with appropriate criticality.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 2 — LEGAL AND REGULATORY SOURCES
+# ─────────────────────────────────────────────────────────────────────────────
+tier_2_legal_regulatory:
+
+  - source_id: "REG-TH-001"
+    title: "Hazardous Substance Act B.E. 2535 (1992) and amendments"
+    jurisdiction: "Thailand"
+    regulator: "Department of Industrial Works (DIW) — Ministry of Industry"
+    url: "https://www.diw.go.th"
+    scope: >-
+      Classification, registration, licensing, handling, storage, transport,
+      import, and export of hazardous substances. Defines four substance types
+      with increasing regulatory requirements.
+    applicability_to_jsea: >-
+      Determines legal classification of chemicals in process. Type 3 chemicals
+      require DIW registration and must be handled per approved conditions.
+      Affects SDS requirements and emergency notification obligations.
+    legal_status: "Primary law — mandatory for all Thai facilities handling classified substances"
+    effective: "1992 — multiple amendments; verify current version with DIW"
+    limitations: "AI must not cite specific Type classifications without current DIW chemical list"
+
+  - source_id: "REG-TH-002"
+    title: "Factory Act B.E. 2535 (1992) and implementing notifications"
+    jurisdiction: "Thailand"
+    regulator: "Department of Industrial Works (DIW)"
+    url: "https://www.diw.go.th"
+    scope: "Factory safety, environmental control, pollution prevention, operating license"
+    applicability_to_jsea: "Baseline operating requirements; safety officer requirements; incident reporting"
+    legal_status: "Primary law — mandatory for licensed factories"
+    limitations: "General safety framework; does not contain PSM-specific requirements"
+
+  - source_id: "REG-TH-003"
+    title: "Occupational Safety, Health and Environment Act B.E. 2554 (2011)"
+    jurisdiction: "Thailand"
+    regulator: "Department of Labour Protection and Welfare (DOSH) — Ministry of Labour"
+    url: "https://www.osha.or.th"
+    scope: >-
+      Employer obligations for occupational safety and health; risk assessment;
+      safety officer and committee requirements; training; incident investigation
+    applicability_to_jsea: >-
+      Legal basis for conducting risk assessments (including JSEA) in Thai workplaces.
+      Requires safety officers to supervise hazardous work. Establishes Stop Work
+      Authority-equivalent obligations.
+    legal_status: "Primary law — mandatory"
+    effective: "2011"
+
+  - source_id: "REG-TH-004"
+    title: "IEAT Notification No. 34/2564 — PSM Guidelines for IEAT Industrial Estates"
+    jurisdiction: "Thailand — Industrial Estate Authority of Thailand (IEAT) sites only"
+    regulator: "Industrial Estate Authority of Thailand (IEAT)"
+    url: "https://www.ieat.go.th"
+    scope: >-
+      Process Safety Management guidelines for facilities within IEAT industrial
+      estates. Most explicit PSM-specific regulatory framework in Thailand.
+      Covers elements analogous to OSHA PSM 14 elements.
+    applicability_to_jsea: >-
+      For IEAT-sited facilities: PSI, PHA, MOC, PSSR, MI, operating procedures,
+      and contractor management are explicitly required. JSEA must connect to
+      these elements.
+    legal_status: "Regulatory notification — mandatory for IEAT facility operators"
+    limitations: "Applies only within IEAT-designated industrial estates"
+    ai_note: "Confirm whether facility is IEAT-governed before citing this notification"
+
+  - source_id: "REG-TH-005"
+    title: "DOSH Ministerial Regulation on Chemical Safety (various notifications)"
+    jurisdiction: "Thailand"
+    regulator: "DOSH / Ministry of Labour"
+    url: "https://www.labour.go.th"
+    scope: "OEL (Occupational Exposure Limits) for hazardous substances in workplace"
+    applicability_to_jsea: "Thai OEL values govern exposure assessment in JSEA"
+    limitations: "OEL list requires current version — contact DOSH for current notification"
+    ai_note: >-
+      Thai OEL values may differ from OSHA PEL, ACGIH TLV, or EU OEL.
+      AI must flag that the applicable Thai OEL must be confirmed by Occupational
+      Hygienist and site regulatory compliance team.
+
+  - source_id: "REG-USA-001"
+    title: "OSHA 29 CFR 1910.119 — Process Safety Management of Highly Hazardous Chemicals"
+    jurisdiction: "United States (reference standard — not directly applicable to Thai facilities)"
+    regulator: "US Occupational Safety and Health Administration (OSHA)"
+    url: "https://www.osha.gov/process-safety-management"
+    url_standards: "https://www.osha.gov/process-safety-management/standards"
+    scope: "14-element PSM framework; PSI 3 pillars; PHA, MOC, MI, operating procedures"
+    applicability_to_jsea: >-
+      Most detailed PSI information requirements globally (1910.119(d)).
+      Widely adopted as international reference standard. Does not apply as
+      Thai law but provides the PSI framework structure used in this package.
+    legal_status: "US federal regulation — reference/good practice for non-US facilities"
+    access_note: "Full text publicly available at osha.gov"
+
+  - source_id: "REG-USA-002"
+    title: "EPA 40 CFR Part 68 — Risk Management Program (RMP)"
+    jurisdiction: "United States (reference)"
+    regulator: "US Environmental Protection Agency (EPA)"
+    url: "https://www.epa.gov/rmp"
+    scope: "Accidental release prevention; off-site consequence analysis; emergency response coordination"
+    applicability_to_jsea: "Off-site consequence methodology; emergency planning integration"
+    legal_status: "US federal regulation — reference for non-US facilities"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 3 — INTERNATIONAL STANDARDS AND RECOGNIZED GOOD PRACTICE
+# ─────────────────────────────────────────────────────────────────────────────
+tier_3_international_standards:
+
+  - source_id: "STD-ISO-001"
+    title: "ISO 45001:2018 — Occupational Health and Safety Management Systems"
+    publisher: "International Organization for Standardization"
+    url: "https://www.iso.org/standard/63787.html"
+    access: "Paywalled — standard text not reproduced"
+    scope: "OH&S management system; hazard identification; worker participation; operational planning and control"
+    applicability_to_jsea: "JSEA aligns with §8.1.2 (elimination/hierarchy of controls) and §8.1.3 (management of change)"
+    revision_note: "Confirm current version — was under revision cycle as of 2026"
+
+  - source_id: "STD-ISO-002"
+    title: "ISO 14001:2026 — Environmental Management Systems"
+    publisher: "International Organization for Standardization"
+    url: "https://www.iso.org/standard/14001"
+    access: "Paywalled"
+    scope: "Environmental aspect-impact identification; emergency preparedness; performance evaluation"
+    applicability_to_jsea: "Environmental aspect-impact chain used in Package 1B environmental pathway mapping"
+
+  - source_id: "STD-CCPS-001"
+    title: "Guidelines for Risk Based Process Safety (CCPS RBPS)"
+    publisher: "Center for Chemical Process Safety (CCPS), AIChE"
+    access: "Paywalled — published book; public summaries available"
+    scope: "20-element RBPS framework: process knowledge management, HIRA, safe work practices, asset integrity, MOC, operational readiness, conduct of operations, emergency management"
+    applicability_to_jsea: >-
+      JSEA falls under the 'Safe Work Practices' RBPS element.
+      PSI connects to 'Process Knowledge Management'.
+      PHA/HAZOP connects to 'Hazard Identification and Risk Analysis'.
+    relevant_elements_for_jsea:
+      - "Process Knowledge Management (PSI)"
+      - "Hazard Identification and Risk Analysis (PHA, HAZOP, LOPA)"
+      - "Safe Work Practices (PTW, JSEA, isolation, confined space, hot work)"
+      - "Asset Integrity and Reliability (MI, inspection)"
+      - "Management of Change"
+      - "Operational Readiness (PSSR)"
+
+  - source_id: "STD-HSE-001"
+    title: "HSG250 — Guidance on Permit-to-Work Systems"
+    publisher: "UK Health and Safety Executive (HSE)"
+    url: "https://www.hse.gov.uk/pubns/books/hsg250.htm"
+    access: "Public — available from HSE website"
+    scope: "PTW design; roles (Issuing Authority, Performing Authority); conflict management; hot work; confined space; electrical"
+    applicability_to_jsea: "PTW and JSEA integration; role definitions; SIMOPS conflict management"
+    legal_status: "UK guidance — not legal requirement outside UK; recognized international good practice"
+
+  - source_id: "STD-HSE-002"
+    title: "HSG253 — The Safe Isolation of Plant and Equipment"
+    publisher: "UK Health and Safety Executive (HSE)"
+    url: "https://www.hse.gov.uk/pubns/books/hsg253.htm"
+    access: "Public — available from HSE website"
+    scope: "Isolation hierarchy; positive isolation; DBB limitations; spectacle blind; line breaking"
+    applicability_to_jsea: >-
+      Foundational reference for isolation adequacy challenge patterns in Package 2B.
+      Defines when DBB is and is not adequate. Defines positive isolation requirements.
+    legal_status: "UK guidance — international good practice"
+
+  - source_id: "STD-IEC-001"
+    title: "IEC 61511:2016 — Functional Safety: Safety Instrumented Systems (SIS)"
+    publisher: "International Electrotechnical Commission (IEC)"
+    access: "Paywalled"
+    scope: "SIL determination; LOPA; proof testing; bypass management; SIS design and management"
+    applicability_to_jsea: "SIS bypass challenge patterns; SIL assessment context for JSEA safeguard review"
+    legal_status: "International standard — recognized good practice; some jurisdictions reference in regulation"
+
+  - source_id: "STD-OSHA-001"
+    title: "OSHA 3071 — Job Hazard Analysis"
+    publisher: "US Occupational Safety and Health Administration"
+    url: "https://www.osha.gov/sites/default/files/publications/OSHA3071.pdf"
+    access: "Public — free download"
+    scope: "JHA methodology; step-based analysis; worker and supervisor participation; common hazard prompts"
+    applicability_to_jsea: "Foundational JHA/JSEA methodology reference"
+
+  - source_id: "STD-API-001"
+    title: "API RP 750 — Management of Process Hazards"
+    publisher: "American Petroleum Institute (API)"
+    access: "Paywalled"
+    scope: "Process hazard analysis for petroleum and petrochemical facilities; PSI; MOC; incident investigation"
+    applicability_to_jsea: "Petroleum/petrochemical industry process hazard management basis"
+    note: "Largely incorporated into OSHA PSM framework"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 4 — MANUFACTURER AND SUPPLIER SOURCES
+# ─────────────────────────────────────────────────────────────────────────────
+tier_4_manufacturer_supplier:
+  description: >-
+    Manufacturer and supplier sources are authoritative for their specific
+    products. AI must request site-approved SDS (not generic SDS) and
+    equipment manuals. AI must not substitute generic manufacturer data
+    for product-specific documents.
+  categories:
+    - type: "Safety Data Sheet (SDS)"
+      scope: "Chemical identity, hazards, handling, emergency response"
+      authority_level: "Site-approved, current revision from named manufacturer"
+      ai_rule: "Request SDS by chemical name and manufacturer. Reject generic or AI-generated SDS."
+    - type: "Equipment Manual (Operations and Maintenance)"
+      scope: "Operating limits, permitted cleaning media, inspection intervals, failure modes"
+      authority_level: "OEM-issued for specific equipment model/serial number"
+    - type: "Instrument/Detector Specifications and Calibration Requirements"
+      scope: "Detector gas type, range, alarm setpoints, calibration gas specification"
+      authority_level: "Manufacturer + site calibration procedure"
+    - type: "Material Compatibility Data"
+      scope: "Chemical resistance of seals, gaskets, coatings, piping materials"
+      authority_level: "Manufacturer compatibility tables + site engineering confirmation"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 5 — GENERAL WEB SOURCES (ORIENTATION ONLY)
+# ─────────────────────────────────────────────────────────────────────────────
+tier_5_general_web:
+  ai_rule: >-
+    General web sources (blogs, vendor marketing, forum posts, news articles,
+    AI-generated summaries) are Tier 5 only. They may generate a hypothesis
+    or research question but must NEVER be cited as authoritative for:
+    - Hazard determination
+    - Regulatory requirement
+    - Chemical property
+    - Equipment rating or specification
+    - Process safety design decision
+  evidence_label_when_cited: "AI_HYPOTHESIS — source is Tier 5 web, verification required from Tier 1-4"
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: >-
+      Initial creation. Thailand regulatory framework (DIW, IEAT, DOSH) identified.
+      International standards (ISO 45001/14001, CCPS RBPS, HSE HSG250/253, IEC 61511,
+      OSHA JHA/PSM, API RP 750) bibliographically recorded with public access notes.
+      AI behavior rules per tier defined.

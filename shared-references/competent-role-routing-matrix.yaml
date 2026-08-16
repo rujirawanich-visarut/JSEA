@@ -1,0 +1,211 @@
+schema_version: "1.0.0"
+schema_id: "competent-role-routing-matrix"
+status: "operational"
+description: >-
+  Routing matrix defining which competent role or authority the AI must direct
+  specific hazard domains, evidence requests, and escalation decisions to.
+  This matrix applies across Package 1B and Package 2B.
+  Role titles are generic and must be validated against site-specific
+  governance (organizational chart, PTW roles, and competency register).
+  AI must never use this matrix to determine who 'should' authorize work —
+  that is always a HUMAN_ONLY_DECISION per site PTW procedure.
+authority_basis:
+  - "OSHA 29 CFR 1910.119 — Employee participation; Contractor requirements"
+  - "CCPS RBPS — Process safety competency; Workforce involvement"
+  - "ISO 45001:2018 §5.3 — Organizational roles, responsibilities, authorities"
+  - "UK HSE HSG250 — PTW roles: Issuing Authority, Performing Authority"
+created_date: "2026-08-15"
+update_owner: "SSHE Lead / HSE Manager"
+review_frequency: "Annual + after any organizational change affecting safety roles"
+applies_to:
+  - "jsea-hazard-blind-spot-mapper v1.1.0+"
+  - "jsea-safeguard-challenge-assistant v1.1.0+"
+usage_note: >-
+  Role titles vary by organization and site. The AI must always remind users
+  to map these generic roles to their site-specific equivalents.
+  This matrix is for routing questions and evidence requests only —
+  it does not confer authority on any individual or role.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 1: HAZARD DOMAIN → COMPETENT ROLE ROUTING
+# ─────────────────────────────────────────────────────────────────────────────
+hazard_domain_routing:
+
+  - domain: "Chemical identity and stream composition"
+    primary_role: "Process Engineer"
+    secondary_role: "Chemical Engineer"
+    escalation: "Process Safety Engineer → Area Owner"
+    evidence_domain: "PSI Pillar 1 — Chemical hazard information"
+    ai_routing_trigger: "Chemical identity unknown, trace toxic suspected, SDS unavailable"
+
+  - domain: "Chemical reactivity and runaway potential"
+    primary_role: "Chemical Engineer or Process Safety Engineer"
+    secondary_role: "Process Engineer"
+    escalation: "Site Process Safety Lead → Corporate Process Safety"
+    evidence_domain: "PSI Pillar 1 — Reactivity; PHA/HAZOP register"
+    ai_routing_trigger: "Exothermic reaction, polymerization, or runaway scenario identified"
+
+  - domain: "Toxic exposure assessment and PPE selection"
+    primary_role: "Occupational Hygienist (Industrial Hygienist)"
+    secondary_role: "Area HSE"
+    escalation: "Medical Officer (if exposure has occurred) → Regulatory notification"
+    evidence_domain: "OEL/IDLH data; atmospheric monitoring records; PPE selection matrix"
+    ai_routing_trigger: "IDLH-concentration toxic confirmed or suspected; atmospheric test above threshold"
+
+  - domain: "Process operating conditions and Safe Operating Limits"
+    primary_role: "Operations Supervisor (Board Operator / Control Room)"
+    secondary_role: "Process Engineer"
+    escalation: "Operations Superintendent"
+    evidence_domain: "PSI Pillar 2 — SOL sheets; real-time DCS data"
+    ai_routing_trigger: "Current operating P, T, Level, or Flow unknown or outside SOL"
+
+  - domain: "P&ID tracing, line identification, and equipment identification"
+    primary_role: "Operations or Process Engineer (P&ID holder)"
+    secondary_role: "Piping Engineer"
+    escalation: "Engineering Manager"
+    evidence_domain: "PSI Pillar 3 — P&ID current revision; as-built drawings"
+    ai_routing_trigger: "P&ID revision outdated, field-vs-drawing mismatch, unknown line"
+
+  - domain: "Isolation scheme design and adequacy"
+    primary_role: "Isolation Authority (Operations Supervisor or named Competent Person)"
+    secondary_role: "Operations Superintendent"
+    escalation: "PTW Administrator → Area Owner"
+    evidence_domain: "Site isolation standard; Blind/Spade List; PSI Pillar 3"
+    ai_routing_trigger: "Isolation type questioned, check valve or single valve as isolation, positive isolation not confirmed"
+
+  - domain: "Confined space classification and rescue"
+    primary_role: "Confined Space Supervisor (site-defined competent person)"
+    secondary_role: "Occupational Hygienist"
+    escalation: "Emergency Coordinator → External rescue services"
+    evidence_domain: "Confined space register; rescue plan; atmospheric monitoring record"
+    ai_routing_trigger: "No rescue confirmed, atmosphere unknown, confined space classification unclear"
+
+  - domain: "Safety Instrumented Systems (SIS) / Interlock status"
+    primary_role: "Instrumentation Engineer"
+    secondary_role: "Control Systems Engineer"
+    escalation: "Process Safety Engineer → Area Owner"
+    evidence_domain: "Bypass/Inhibit register; Cause & Effect diagrams; IEC 61511 records"
+    ai_routing_trigger: "SIS bypassed without MOC, interlock status unknown, alarm unavailable"
+
+  - domain: "Pressure relief, vent, and flare system integrity"
+    primary_role: "Process Engineer"
+    secondary_role: "Piping Engineer"
+    escalation: "Asset Integrity Lead"
+    evidence_domain: "Relief system design basis; Car-seal-open register; flare header status"
+    ai_routing_trigger: "Relief path status unknown, relief device overdue for inspection, blocked relief concern"
+
+  - domain: "Mechanical integrity and equipment condition"
+    primary_role: "Inspection Engineer (Corrosion/Integrity)"
+    secondary_role: "Corrosion Engineer"
+    escalation: "Asset Integrity Lead"
+    evidence_domain: "MI inspection records; thickness data; fitness-for-service assessment"
+    ai_routing_trigger: "Corrosion, wall loss, temporary repair, or overdue inspection identified"
+
+  - domain: "Hazardous area classification and Ex-equipment"
+    primary_role: "Electrical Engineer (Ex-competent person)"
+    secondary_role: "Area HSE"
+    escalation: "Permit Issuing Authority for Hot Work"
+    evidence_domain: "Area Classification Drawing; Ex-certificate (ATEX/IECEx)"
+    ai_routing_trigger: "Area classification unknown, non-Ex-rated equipment in classified area, hot work in Zone 1"
+
+  - domain: "SIMOPS coordination and permit conflict"
+    primary_role: "Area Coordinator"
+    secondary_role: "PTW Administrator"
+    escalation: "Operations Superintendent"
+    evidence_domain: "Active permit map; SIMOPS plan; shift log"
+    ai_routing_trigger: "Conflicting permits, shared isolation, evacuation route conflict"
+
+  - domain: "Environmental release and receptor impact"
+    primary_role: "Environmental Officer (EHS)"
+    secondary_role: "EHS Manager"
+    escalation: "Regulatory notification (Thailand DIW/IEAT; applicable environmental authority)"
+    evidence_domain: "Environmental aspect register; drainage destination map; bund capacity"
+    ai_routing_trigger: "Release to environment likely, drain destination unknown, off-site receptor within impact zone"
+
+  - domain: "Emergency response capability"
+    primary_role: "Emergency Coordinator"
+    secondary_role: "ERP Administrator (SSHE)"
+    escalation: "External emergency services (fire, hazmat, medical)"
+    evidence_domain: "Emergency Response Plan; drill/exercise records; equipment inspection"
+    ai_routing_trigger: "No rescue capability confirmed, emergency access blocked, ERP outdated"
+
+  - domain: "Management of Change (MOC) status"
+    primary_role: "MOC Coordinator"
+    secondary_role: "Process Engineer or Operations Supervisor"
+    escalation: "Area Owner → Engineering Manager"
+    evidence_domain: "MOC Register; open items list; PSSR completion status"
+    ai_routing_trigger: "Open MOC affecting work area, undocumented temporary modification found"
+
+  - domain: "PHA/HAZOP recommendations and open items"
+    primary_role: "Process Safety Engineer"
+    secondary_role: "Operations or Process Engineer"
+    escalation: "Site Process Safety Lead → Site Manager"
+    evidence_domain: "PHA/HAZOP action register; revalidation schedule"
+    ai_routing_trigger: "Open PHA recommendation affecting task scope or area"
+
+  - domain: "Contractor safety management and language/communication"
+    primary_role: "Contractor Supervisor"
+    secondary_role: "Site Contract Management Representative"
+    escalation: "Area HSE → Operations Supervisor"
+    evidence_domain: "Contractor competency register; toolbox talk record; JSEA in appropriate language"
+    ai_routing_trigger: "Language barrier identified, contractor unfamiliarity with site-specific hazard, JSEA not available in worker language"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 2: WORK AUTHORIZATION AND GOVERNANCE
+# These are HUMAN_ONLY_DECISION — AI must not route these as if AI can contribute
+# a decision; only route to the named human role.
+# ─────────────────────────────────────────────────────────────────────────────
+work_authorization_roles:
+
+  - decision: "JSEA approval and sign-off"
+    authority: "Supervisor (Performing Authority) + Worker Participation confirmation"
+    ai_role: "Support preparation only — HUMAN_ONLY_DECISION"
+
+  - decision: "Permit to Work issuance"
+    authority: "Permit Issuing Authority (PIaA) — named in site PTW procedure"
+    ai_role: "HUMAN_ONLY_DECISION — AI must not issue, endorse, or imply permit approval"
+
+  - decision: "Work authorization / Safe-to-proceed declaration"
+    authority: "Area Owner + Performing Authority"
+    ai_role: "HUMAN_ONLY_DECISION"
+
+  - decision: "Final risk acceptance (residual risk)"
+    authority: "Area Owner or SSHE Manager per site risk tolerance matrix"
+    ai_role: "HUMAN_ONLY_DECISION"
+
+  - decision: "Stop Work Authority invocation"
+    authority: "Any worker on site (Stop Work Authority is universal)"
+    ai_role: >-
+      AI must support and reinforce Stop Work Authority.
+      AI must never suggest overriding or questioning Stop Work Authority invocation.
+
+  - decision: "Emergency declaration and evacuation"
+    authority: "Emergency Coordinator / Site Commander / Area Owner"
+    ai_role: "HUMAN_ONLY_DECISION"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 3: REGULATORY AND LEGAL ESCALATION ROUTING
+# ─────────────────────────────────────────────────────────────────────────────
+regulatory_routing:
+
+  - jurisdiction: "Thailand (all facilities)"
+    relevant_conditions:
+      - "Chemical release to environment"
+      - "Major accident (injury, fatality, major release)"
+      - "PSM incident at IEAT-governed facility"
+    primary_regulator: "Department of Industrial Works (DIW)"
+    contact: "https://www.diw.go.th"
+    secondary_regulator: "IEAT (if facility within industrial estate)"
+    contact_ieat: "https://www.ieat.go.th"
+    occupational_safety: "Department of Labour Protection and Welfare (DOSH)"
+    contact_dosh: "https://www.osha.or.th"
+    ai_note: >-
+      AI must not specify regulatory notification timelines or legal requirements
+      without citing current Thai law (Hazardous Substance Act B.E. 2535,
+      Factory Act B.E. 2535, OSHA Act B.E. 2554). Site Legal/Compliance team
+      must confirm applicable requirements.
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. 17 hazard domain routing entries, 6 work authorization roles, Thailand regulatory routing."

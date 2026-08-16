@@ -1,0 +1,74 @@
+schema_version: "1.0.0"
+register_id: "notebooklm-claim-review-2026-08-15"
+status: "reviewed_for_staged_integration"
+assessment: "JSEA_notebooklm_knowledge_assessment.md"
+review_rules:
+  - "Accept mechanisms and evidence questions only at claim level."
+  - "Reject embedded approval, veto, lock, scoring, and executable-code behavior."
+  - "Require source-bound applicability before accepting any numerical criterion."
+  - "Route engineering calculations and human-only decisions to competent roles."
+reviews:
+  - sku_id: "PHYS_THE_001"
+    disposition: "normalize_and_merge_wave_1"
+    accepted_scope: ["trapped-liquid expansion", "depressurization and low-temperature concern"]
+    rejected_scope: ["universal pressure examples", "universal Joule-Thomson cooling", "permit veto"]
+    target_claims: ["PCR-001", "PCR-002"]
+  - sku_id: "PHYS_RAG_002"
+    disposition: "normalize_and_merge_wave_1"
+    accepted_scope: ["reactivity screening", "accidental mixing pathway", "compatibility evidence need"]
+    rejected_scope: ["Rule of Six as final determination", "keyword-triggered veto"]
+    target_claims: ["PCR-003"]
+  - sku_id: "PHYS_KIN_003"
+    disposition: "normalize_and_merge_wave_1"
+    accepted_scope: ["heat generation versus removal", "runaway dependencies", "calorimetry evidence need"]
+    rejected_scope: ["pseudo-simulation", "hard-coded severity thresholds", "automatic SOL selection"]
+    target_claims: ["PCR-004"]
+  - sku_id: "PHYS_PYR_004"
+    disposition: "normalize_and_merge_wave_1"
+    accepted_scope: ["sour-service deposits", "oxygen exposure and drying", "self-heating ignition pathway"]
+    rejected_scope: ["generic chemical recipe", "treatment approval by AI"]
+    target_claims: ["PCR-005"]
+  - sku_id: "ISD_SPS_002"
+    disposition: "defer_wave_2_engineering_context"
+    accepted_scope: ["process and equipment topology", "case retrieval taxonomy"]
+    rejected_scope: ["uncalibrated similarity scoring", "accident analogy as approval"]
+  - sku_id: "ISD_LAY_003"
+    disposition: "defer_wave_2_specialist_route"
+    accepted_scope: ["low-point accumulation", "spatial and SIMOPS questions"]
+    rejected_scope: ["fixed distance or flux rules", "density-only conclusions"]
+  - sku_id: "AST_MECH_001"
+    disposition: "defer_wave_2_specialist_route"
+    accepted_scope: ["damage-mechanism vocabulary", "inspection evidence prompts"]
+    rejected_scope: ["universal thresholds", "sensor-only diagnosis", "material selection"]
+  - sku_id: "AST_FFS_002"
+    disposition: "defer_wave_2_specialist_route"
+    accepted_scope: ["formal FFS evidence need", "authorized-engineer routing"]
+    rejected_scope: ["universal RSF rule", "AI return-to-service decision"]
+  - sku_id: "AST_REL_003"
+    disposition: "defer_wave_2_specialist_route"
+    accepted_scope: ["maintenance backlog", "inspection and failure-history dependencies"]
+    rejected_scope: ["invented risk multipliers", "generic velocity limits"]
+  - sku_id: "HUM_COG_001"
+    disposition: "defer_wave_3_socio_technical"
+    accepted_scope: ["skill-rule-knowledge modes", "slips, lapses, mistakes", "cognitive load"]
+    rejected_scope: ["personal error probability", "automatic control selection"]
+  - sku_id: "HUM_OPS_002"
+    disposition: "defer_wave_3_socio_technical"
+    accepted_scope: ["handover", "status mismatch", "physical verification"]
+    rejected_scope: ["universal DBB or SCBA", "digital-token mandate", "OD multiplier"]
+  - sku_id: "HUM_FAT_003"
+    disposition: "redesign_wave_3"
+    accepted_scope: ["schedule", "rest", "workload", "readiness and competency"]
+    rejected_scope: ["contractor bias", "medical inference", "FRI", "RFID lock", "quarantine"]
+  - sku_id: "GOV_MOC_002"
+    disposition: "defer_wave_3_socio_technical"
+    accepted_scope: ["RIK versus change cues", "PSSR and document update evidence"]
+    rejected_scope: ["arbitrary deviation percentage", "system locks", "AI approval"]
+  - sku_id: "ISD_ISI_001"
+    disposition: "separate_wave_4_design_tool"
+    accepted_scope: ["design-stage comparison", "inherent-safety principles"]
+    rejected_scope: ["task-level scoring", "permit threshold"]
+  - sku_id: "GOV_COMP_001"
+    disposition: "separate_wave_4_source_registry"
+    accepted_scope: ["regulatory source topics", "SDS and PSI prompts"]
+    rejected_scope: ["mixed-jurisdiction hard rules", "obsolete COMAH 1999", "legal decision engine"]

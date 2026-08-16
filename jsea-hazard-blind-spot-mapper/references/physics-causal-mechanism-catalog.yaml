@@ -1,0 +1,263 @@
+schema_version: "1.0.0"
+schema_id: "physics-causal-mechanism-catalog"
+status: "draft_wave_1_for_semantic_qualification"
+description: >-
+  Five normalized Wave 1 causal mechanisms derived from the reviewed NotebookLM
+  intake and verified against traceable public sources. These claims generate
+  hypotheses and evidence needs; they do not authorize work or replace engineering
+  calculations and approved site procedures.
+created_date: "2026-08-16"
+update_owner: "Process Safety Engineer / AI Governance Owner"
+numeric_criteria: []
+
+claims:
+  - claim_id: "PCR-001"
+    title: "Trapped-liquid thermal expansion in a constrained boundary"
+    claim_type: "physical_mechanism"
+    status: "draft_for_qualification"
+    source_state: "REFERENCE"
+    source_skus: ["PHYS_THE_001"]
+    applicability:
+      job_types: ["isolation", "line_breaking", "maintenance", "startup_shutdown"]
+      equipment_topology: ["blocked_segment", "dead_leg", "valve_cavity", "liquid_full_boundary"]
+      material_or_phase: ["liquid", "nearly_liquid_full"]
+    preconditions:
+      required:
+        - "A liquid-filled or nearly liquid-filled volume is isolated or otherwise constrained."
+        - "A credible heat input or temperature increase exists."
+        - "Expansion space or a suitable pressure-relief path is absent, unknown, isolated, or impaired."
+      disconfirming:
+        - "A verified open expansion path prevents pressure containment for the relevant period."
+        - "A suitable relief path is confirmed available and applicable by approved engineering evidence."
+        - "Field and drawing evidence show the segment is not liquid-full and cannot become liquid-full."
+    causal_chain:
+      initiating_change: "Temperature of the constrained liquid increases."
+      mechanism: "Liquid volume expands while the boundary limits volume change."
+      intermediate_state: "Pressure can increase in the isolated volume."
+      release_or_exposure_pathway: "Leak, boundary failure, or energetic release during opening or manipulation."
+      exposed_targets: ["worker", "process equipment", "environment"]
+      consequence_candidates: ["chemical exposure", "line-of-fire injury", "loss of containment"]
+    observable_signals:
+      - "Heat tracing, solar heating, adjacent hot service, or warming after isolation."
+      - "Drain or bleed behavior inconsistent with the declared zero-energy state."
+      - "P&ID topology showing a blocked liquid segment or valve cavity."
+    runtime_evidence_required:
+      - "Confirmed material identity and phase."
+      - "Current P&ID and field-verified isolation boundary."
+      - "Heat-input sources and expected duration."
+      - "Expansion, vent, drain, or relief path status."
+      - "Field pressure indication at the affected segment when safely obtainable under site procedure."
+    support_states: ["SUPPORTED_BY_FACT", "PLAUSIBLE_UNVERIFIED", "CONTRADICTED", "NOT_APPLICABLE", "INSUFFICIENT_EVIDENCE", "SPECIALIST_CALCULATION_REQUIRED"]
+    control_objectives:
+      - "Prevent formation of an unrelieved constrained liquid volume."
+      - "Verify and maintain an approved pressure-release or expansion path where required."
+      - "Prevent exposure while zero-energy status remains unconfirmed."
+    prohibited_inferences:
+      - "Do not calculate pressure rise without validated fluid properties, boundary conditions, and an approved method."
+      - "Do not assume zero pressure from procedure completion or one instrument alone."
+      - "Do not prescribe an isolation class or relief design without the site standard and engineering review."
+    competent_role: "Process Engineer / Isolation Authority"
+    verification_question: "Could any liquid-filled segment or valve cavity be trapped and heated within the work boundary, and what current evidence confirms its pressure-release path?"
+    source_ids: ["PCR-SRC-001", "PCR-SRC-008"]
+
+  - claim_id: "PCR-002"
+    title: "Depressurization, flashing, and low-temperature material concern"
+    claim_type: "phase_behavior_mechanism"
+    status: "draft_for_qualification"
+    source_state: "REFERENCE"
+    source_skus: ["PHYS_THE_001"]
+    applicability:
+      job_types: ["depressurization", "blowdown", "draining", "line_breaking", "startup_shutdown"]
+      equipment_topology: ["pressurized_system", "restriction", "blowdown_path", "flare_path"]
+      material_or_phase: ["pressurized_gas", "liquefied_gas", "flashing_liquid", "multicomponent_stream"]
+    preconditions:
+      required:
+        - "A credible pressure reduction or phase change occurs."
+        - "The process fluid and initial/final state can produce a material temperature change."
+        - "A pressure boundary or exposed person could be affected by the resulting temperature."
+      disconfirming:
+        - "An approved calculation for the actual fluid and states shows temperatures remain within applicable limits."
+        - "The job boundary has no depressurization, flashing, or expansion step."
+        - "Equipment and temporary connections are verified suitable for the calculated temperature envelope."
+    causal_chain:
+      initiating_change: "Pressure is reduced or fluid crosses a phase boundary."
+      mechanism: "Isenthalpic effects, flashing, evaporation, heat transfer, and inventory depletion can change fluid and metal temperature."
+      intermediate_state: "Local fluid, equipment, or temporary connection temperature may decrease or increase depending on fluid and state."
+      release_or_exposure_pathway: "Low-temperature contact, material embrittlement concern, seal degradation, or boundary failure."
+      exposed_targets: ["worker", "pressure boundary", "temporary hose or connection"]
+      consequence_candidates: ["cold injury", "loss of containment", "brittle-fracture concern"]
+    observable_signals:
+      - "Rapid pressure reduction or flashing at a restriction."
+      - "Unexpected frost, condensation, or surface-temperature change."
+      - "A blowdown or depressurization path through carbon-steel or temporary equipment."
+    runtime_evidence_required:
+      - "Confirmed stream composition and phase behavior."
+      - "Initial and final pressure and temperature states."
+      - "Approved depressurization or phase-equilibrium calculation."
+      - "Equipment MDMT or applicable temperature rating."
+      - "Approved procedure and temporary-equipment temperature rating."
+    support_states: ["SUPPORTED_BY_FACT", "PLAUSIBLE_UNVERIFIED", "CONTRADICTED", "NOT_APPLICABLE", "INSUFFICIENT_EVIDENCE", "SPECIALIST_CALCULATION_REQUIRED"]
+    control_objectives:
+      - "Keep equipment and exposure conditions within the approved temperature envelope."
+      - "Use an approved depressurization method and rate where required."
+      - "Verify material and temporary-equipment suitability for the calculated state."
+    prohibited_inferences:
+      - "Do not state that Joule-Thomson expansion always cools the fluid."
+      - "Do not infer minimum metal temperature from pressure alone."
+      - "Do not select material, blowdown rate, or acceptance criterion without approved engineering evidence."
+    competent_role: "Process Engineer / Materials Engineer"
+    verification_question: "What calculation for the actual fluid and pressure path establishes the temperature envelope, and how does it compare with the approved equipment limits?"
+    source_ids: ["PCR-SRC-002", "PCR-SRC-008"]
+
+  - claim_id: "PCR-003"
+    title: "Hazardous chemical interaction through an accidental mixing pathway"
+    claim_type: "chemical_mechanism"
+    status: "draft_for_qualification"
+    source_state: "REFERENCE"
+    source_skus: ["PHYS_RAG_002"]
+    applicability:
+      job_types: ["cleaning", "flushing", "draining", "transfer", "line_breaking", "waste_handling"]
+      equipment_topology: ["shared_header", "receiving_vessel", "residual_holdup", "cross_connection", "drain_system"]
+      material_or_phase: ["two_or_more_chemicals", "unknown_residue", "cleaning_agent"]
+    preconditions:
+      required:
+        - "At least two identified or plausibly present materials can contact each other."
+        - "A physical mixing pathway exists or is not yet ruled out."
+        - "Reference or approved data indicates a possible hazardous interaction."
+      disconfirming:
+        - "Current approved compatibility evidence covers the actual substances, concentrations, temperatures, and materials of construction."
+        - "Field-verified isolation removes the mixing pathway."
+        - "Confirmed decontamination removes the relevant residue."
+    causal_chain:
+      initiating_change: "Materials contact through transfer, flushing, leakage, backflow, residue, or disposal routing."
+      mechanism: "Chemical interaction may generate heat, gas, pressure, toxic products, fire, polymerization, or material attack."
+      intermediate_state: "Temperature, pressure, composition, or containment condition changes."
+      release_or_exposure_pathway: "Venting, overflow, rupture, open drain, splash, vapor release, or waste reaction."
+      exposed_targets: ["worker", "process equipment", "drainage system", "environment"]
+      consequence_candidates: ["toxic exposure", "thermal injury", "fire or explosion", "overpressure", "loss of containment"]
+    observable_signals:
+      - "A new cleaning or flushing medium is introduced."
+      - "Unknown residue, shared drain, shared header, or receiving-vessel contents."
+      - "Unexpected heat, gas evolution, discoloration, pressure, or foaming."
+    runtime_evidence_required:
+      - "Identity, concentration, temperature, and quantity of every material and residue."
+      - "Current SDS Sections 7 and 10."
+      - "Approved site or manufacturer compatibility data for the actual conditions."
+      - "P&ID or field evidence for all credible mixing and disposal pathways."
+      - "Chemical Engineer review when screening is uncertain or consequential."
+    support_states: ["SUPPORTED_BY_FACT", "PLAUSIBLE_UNVERIFIED", "CONTRADICTED", "NOT_APPLICABLE", "INSUFFICIENT_EVIDENCE", "SPECIALIST_CALCULATION_REQUIRED"]
+    control_objectives:
+      - "Prevent incompatible materials from contacting."
+      - "Verify residue removal and receiving-system compatibility."
+      - "Route generated heat, gas, pressure, and waste within approved system capacity."
+    prohibited_inferences:
+      - "Do not treat a CAMEO or reactive-group result as final compatibility approval."
+      - "Do not assume water or a familiar cleaning agent is safe for an unknown residue."
+      - "Do not infer absence of reaction because no prior incident occurred."
+    competent_role: "Chemical Engineer / Process Engineer"
+    verification_question: "Which materials and residues can physically meet during this job, and what current approved evidence covers their actual concentrations, temperatures, and receiving pathway?"
+    source_ids: ["PCR-SRC-003", "PCR-SRC-004", "PCR-SRC-008"]
+
+  - claim_id: "PCR-004"
+    title: "Exothermic reaction acceleration when heat generation exceeds heat removal"
+    claim_type: "chemical_mechanism"
+    status: "draft_for_qualification"
+    source_state: "REFERENCE"
+    source_skus: ["PHYS_KIN_003"]
+    applicability:
+      job_types: ["reaction", "startup_shutdown", "cleaning", "charging", "temporary_operation", "maintenance_near_reactor"]
+      equipment_topology: ["reactor", "batch_vessel", "polymerization_system", "reactive_inventory"]
+      material_or_phase: ["reactive_mixture", "thermally_unstable_material"]
+    preconditions:
+      required:
+        - "Reactive or thermally unstable inventory is present or can be created."
+        - "A credible initiating deviation can increase reaction rate or reduce heat removal."
+        - "Temperature, pressure, venting, or containment consequences can affect the job boundary."
+      disconfirming:
+        - "Approved chemistry evidence demonstrates no relevant exotherm or decomposition in the actual envelope."
+        - "The task and process boundary cannot create, heat, contaminate, or retain reactive inventory."
+        - "A current approved assessment addresses the exact deviation and confirms the relevant safeguards and limits."
+    causal_chain:
+      initiating_change: "Cooling loss, excessive heating, wrong addition, contamination, accumulation, or delayed response occurs."
+      mechanism: "Heat generation increases relative to heat removal and reaction rate may accelerate with temperature."
+      intermediate_state: "Temperature and possibly pressure rise; secondary decomposition or gas generation may begin."
+      release_or_exposure_pathway: "Relief, venting, overflow, rupture, fire, or toxic release."
+      exposed_targets: ["worker", "reactor boundary", "connected relief system", "community or environment"]
+      consequence_candidates: ["thermal injury", "overpressure", "fire or explosion", "toxic release", "major loss of containment"]
+    observable_signals:
+      - "Unexpected temperature or pressure trend."
+      - "Cooling, agitation, inhibitor, feed control, or relief dependency unavailable or impaired."
+      - "Wrong order, rate, composition, or accumulation of reactive material."
+    runtime_evidence_required:
+      - "Reaction identity, stoichiometry, inventory, concentration, and operating envelope."
+      - "Current calorimetry, thermal-stability, or approved process-chemistry assessment."
+      - "Heat-removal and relief basis for the credible deviation."
+      - "Alarm, trip, interlock, cooling, agitation, inhibitor, and bypass status."
+      - "PHA/HAZOP and operating procedure covering startup, shutdown, and abnormal conditions."
+    support_states: ["SUPPORTED_BY_FACT", "PLAUSIBLE_UNVERIFIED", "CONTRADICTED", "NOT_APPLICABLE", "INSUFFICIENT_EVIDENCE", "SPECIALIST_CALCULATION_REQUIRED"]
+    control_objectives:
+      - "Prevent creation of an uncontrolled reactive condition."
+      - "Maintain or restore approved heat-removal and reaction-control functions."
+      - "Provide approved detection, shutdown, relief, and emergency response for credible deviations."
+    prohibited_inferences:
+      - "Do not calculate onset temperature, reaction rate, time-to-maximum-rate, relief load, or safe operating limit from narrative alone."
+      - "Do not treat a routine job description as evidence that process chemistry is benign."
+      - "Do not accept manual monitoring as equivalent to an impaired engineered safeguard without approved review."
+    competent_role: "Chemical Engineer / Process Safety Engineer"
+    verification_question: "What current chemistry and safeguarding evidence covers loss of heat removal, wrong addition, contamination, and accumulation for the reactive inventory affected by this job?"
+    source_ids: ["PCR-SRC-004", "PCR-SRC-005", "PCR-SRC-008"]
+
+  - claim_id: "PCR-005"
+    title: "Pyrophoric iron-sulfide deposit oxidation after oxygen exposure"
+    claim_type: "chemical_mechanism"
+    status: "draft_for_qualification"
+    source_state: "REFERENCE"
+    source_skus: ["PHYS_PYR_004"]
+    applicability:
+      job_types: ["equipment_opening", "line_breaking", "shutdown", "cleaning", "deposit_removal", "waste_handling"]
+      equipment_topology: ["sour_service_equipment", "vessel", "column", "tank", "piping"]
+      material_or_phase: ["sulfur_bearing_service", "iron_sulfide_deposit_candidate"]
+    preconditions:
+      required:
+        - "Service history or evidence supports possible iron-sulfide deposits."
+        - "Oxygen can enter or contact the deposits."
+        - "Deposits can dry, self-heat, or contact residual combustible material."
+      disconfirming:
+        - "An approved equipment-specific assessment and completed record confirms the hazard was removed or controlled for the work state."
+        - "Service history and inspection evidence rule out relevant sulfur-bearing deposits."
+        - "The equipment remains within a verified condition that prevents the oxygen-contact pathway."
+    causal_chain:
+      initiating_change: "Air or oxygen contacts susceptible deposits during shutdown, opening, cleaning, or waste handling."
+      mechanism: "Oxidation of susceptible iron-sulfide material generates heat; drying can increase ignition potential."
+      intermediate_state: "Deposit temperature rises and can provide an ignition source."
+      release_or_exposure_pathway: "Ignition of deposit or residual combustible material inside equipment or waste container."
+      exposed_targets: ["worker", "equipment", "adjacent process", "waste-handling system"]
+      consequence_candidates: ["fire", "explosion", "burn injury", "secondary loss of containment"]
+    observable_signals:
+      - "Sour or sulfur-bearing service history."
+      - "Dark deposits, smoke, glow, or unexplained hotspot after oxygen exposure."
+      - "Opening, drying, air ingress, or removal of internal scale."
+    runtime_evidence_required:
+      - "Service history and sulfur/H2S information."
+      - "Approved equipment-specific decontamination or passivation procedure."
+      - "Completed decontamination record and verification criteria from the approved procedure."
+      - "Approved atmosphere-control, opening, monitoring, and deposit-waste method."
+      - "Process Engineer and site waste/industrial-hygiene review as applicable."
+    support_states: ["SUPPORTED_BY_FACT", "PLAUSIBLE_UNVERIFIED", "CONTRADICTED", "NOT_APPLICABLE", "INSUFFICIENT_EVIDENCE", "SPECIALIST_CALCULATION_REQUIRED"]
+    control_objectives:
+      - "Prevent uncontrolled oxygen contact and self-heating until the approved work state is established."
+      - "Verify completion of the equipment-specific decontamination or passivation method."
+      - "Prevent ignition of residual combustibles and removed deposits."
+    prohibited_inferences:
+      - "Do not select an oxidizer, concentration, wetting method, PPE ensemble, or waste method from generic guidance."
+      - "Do not infer absence of pyrophoric material from a normal LEL or oxygen reading alone."
+      - "Do not present treatment completion without a named approved record and competent-role verification."
+    competent_role: "Process Engineer / Industrial Hygienist / Waste Specialist"
+    verification_question: "What service history and completed equipment-specific procedure establish how pyrophoric deposits, oxygen ingress, monitoring, and removed waste are controlled for this opening?"
+    source_ids: ["PCR-SRC-006", "PCR-SRC-007", "PCR-SRC-008"]
+
+catalog_boundaries:
+  - "All claims remain REFERENCE until job evidence supports runtime applicability."
+  - "No claim supplies a permit decision, risk score, site setpoint, chemical recipe, PPE selection, or engineering acceptance result."
+  - "Wave 2 engineering context and Wave 3 socio-technical modifiers are not promoted in this catalog."
+  - "Semantic qualification and named domain-owner review are required before status can become operational."

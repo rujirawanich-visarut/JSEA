@@ -1,0 +1,55 @@
+version: 1.0.0
+status: DRAFT
+purpose: Neutral challenge patterns for applying the hierarchy of controls during JSEA safeguard review.
+principles:
+- id: HOC-01
+  level: elimination
+  challenge: Can the hazardous task, exposure, material, energy, or interaction be removed from the job
+    scope?
+  guardrail: Ask for authorized design/process review; do not prescribe unverified modifications.
+- id: HOC-02
+  level: substitution
+  challenge: Can a less hazardous material, method, tool, energy source, or sequence achieve the objective?
+  guardrail: Compatibility, quality, and process consequences require competent-person validation.
+- id: HOC-03
+  level: engineering
+  challenge: Is exposure prevented or limited by physical design, isolation, enclosure, ventilation, guarding,
+    interlock, containment, or fail-safe features?
+  guardrail: Existence and readiness require approved documents and field verification.
+- id: HOC-04
+  level: administrative
+  challenge: Are procedures, permits, sequencing, supervision, competency, communication, and access restrictions
+    clear and verifiable?
+  guardrail: Administrative measures are vulnerable to workload, ambiguity, drift, and human error.
+- id: HOC-05
+  level: ppe
+  challenge: Is PPE selected for the verified hazard and used only as the residual layer?
+  guardrail: Do not treat PPE as eliminating or isolating the hazard.
+challenge_patterns:
+- id: HCP-01
+  name: administrative_only_for_critical_hazard
+  signal: Critical physical/chemical hazard controlled only by procedure, warning, supervision, or PPE.
+  response: Raise LEVEL_2_SPECIALIST_REVIEW; request evidence that higher-order options were considered.
+- id: HCP-02
+  name: vague_control_language
+  signal: Control says be careful, monitor closely, follow procedure, or use suitable PPE without testable
+    detail.
+  response: Request control objective, responsible role, trigger, method, evidence, and escalation.
+- id: HCP-03
+  name: control_not_linked_to_mechanism
+  signal: Safeguard does not interrupt the stated causal pathway.
+  response: Mark AI_HYPOTHESIS and request competent-person review.
+- id: HCP-04
+  name: environmental_end_path_missing
+  signal: Release prevention exists but containment, recovery, waste, drainage, emission, or disposal
+    pathway is absent.
+  response: Request environmental verification and emergency/recovery evidence.
+- id: HCP-05
+  name: temporary_control_normalized
+  signal: Temporary barrier, bypass management, watchkeeping, or workaround is treated as permanent.
+  response: Request duration, authorization, compensating measures, inspection, expiry, and restoration
+    evidence.
+prohibited_inferences:
+- A higher-order control is feasible without engineering review.
+- PPE selection is adequate without verified hazard/exposure data.
+- A safeguard exists or functions because it appears in a document.

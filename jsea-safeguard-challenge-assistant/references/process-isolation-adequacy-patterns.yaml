@@ -1,0 +1,151 @@
+schema_version: "1.0.0"
+schema_id: "process-isolation-adequacy-patterns"
+status: "operational"
+description: >-
+  Challenge patterns for assessing the adequacy of isolation claims in JSEA
+  safeguard review, specifically for process-boundary tasks in chemical and
+  petrochemical facilities. Supplements hierarchy-of-controls-patterns.yaml
+  with process-specific isolation hierarchy and challenge criteria.
+authority_basis:
+  - "UK HSE HSG253 — The safe isolation of plant and equipment"
+  - "OSHA 29 CFR 1910.119 — PSM: Mechanical integrity, safe work practices"
+  - "CCPS RBPS — Safe work practices element"
+  - "API RP 750 — Management of process hazards"
+created_date: "2026-08-15"
+update_owner: "Process Safety Engineer / Isolation Authority"
+review_frequency: "Annual + after any isolation-related incident or near-miss"
+usage_note: >-
+  These patterns generate challenge questions only. The site's approved isolation
+  standard and the Isolation Authority's judgment prevail. AI must not prescribe
+  isolation methods or declare isolation adequate.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ISOLATION HIERARCHY — most to least reliable
+# AI must challenge any claim that lower-tier isolation is adequate for
+# higher-hazard service without specific site-standard justification.
+# ─────────────────────────────────────────────────────────────────────────────
+isolation_hierarchy:
+  - tier: 1
+    name: "Physical disconnection"
+    description: "Physical removal of a pipe spool, blind flange bolted at both ends, or complete valve removal. Provides absolute separation with no possibility of process breakthrough."
+    typical_application: "Highest-consequence toxic, pyrophoric, or cryogenic service. Long-duration isolation."
+    ai_note: "Most reliable isolation. Accept as positive isolation. Request: spool-removed record or blind flange inspection evidence."
+
+  - tier: 2
+    name: "Spectacle blind / Spade fully inserted and locked"
+    description: "A physical solid blind plate inserted in the flange and positively identified in the closed/blinded position. Car-seal or tag required to confirm blind state."
+    typical_application: "Routine positive isolation for IDLH-toxic, high-pressure, or high-inventory service."
+    ai_note: "Accept as positive isolation if field-tagged and recorded in Blind List. Request: Blind List with tag number, field photo or competent-person confirmation."
+    challenge_question: "Is the spectacle blind in the BLIND (solid) position? Is it field-tagged and entered in the Blind List with the location and verifier identified?"
+
+  - tier: 3
+    name: "Blanked flange (open-ended pipe capped)"
+    description: "Open end of a disconnected pipe is blanked with a pressure-rated blind flange. Prevents re-connection inadvertently."
+    typical_application: "Effective for open-ended pipes where the process side is positively isolated upstream."
+    ai_note: "Challenge adequacy if the upstream source is still pressurized."
+
+  - tier: 4
+    name: "Double-block-and-bleed (DBB)"
+    description: "Two isolation valves in series with a bleed valve between them opened to confirm the upstream valve is holding. Pressure monitoring required."
+    typical_application: "Acceptable for low-toxicity, low-pressure, short-duration, or emergency/contingency isolation per site standard. NOT acceptable as positive isolation for IDLH-toxic service."
+    ai_note: "MUST challenge when: service is IDLH-toxic; high-pressure; long-duration; or site isolation standard requires positive isolation. Challenge question required."
+    challenge_question: "Does the site isolation standard permit DBB as the sole isolation method for this service (IDLH-concentration toxic: YES/NO, pressure class, inventory)? Is the bleed monitored continuously? What is the leak-test acceptance criterion?"
+    prohibited_ai_inference: "DBB is adequate for H₂S or other IDLH-toxic service without site-standard confirmation"
+
+  - tier: 5
+    name: "Single valve (manual or motor-operated)"
+    description: "A single valve in the closed position. No independent verification of closure or downstream bleed."
+    typical_application: "Acceptable ONLY for extremely low-hazard, atmospheric-pressure, non-toxic service per site standard. NEVER adequate as primary isolation for maintenance work."
+    ai_note: "Flag as INADEQUATE_ISOLATION for any maintenance task involving pressurized, flammable, or toxic process boundaries. Mandatory challenge."
+    challenge_question: "Is this task relying on a single valve as the only isolation? This requires immediate challenge — request site isolation standard section applicable to this service class."
+
+  - tier: 6
+    name: "Check valve (non-return valve)"
+    description: "A check valve that prevents backflow. NOT an isolation device. Can pass in either direction under pressure differential."
+    typical_application: "NEVER acceptable as an isolation device for work on equipment downstream."
+    ai_note: "Immediate STOP_AND_ESCALATE (SES-02) if check valve is cited as isolation. Do not accept under any framing."
+    stop_condition: "SES-02"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ISOLATION CHALLENGE PATTERNS
+# ─────────────────────────────────────────────────────────────────────────────
+isolation_challenge_patterns:
+
+  - id: "ICP-01"
+    name: "check_valve_as_isolation"
+    signal: "JSEA or isolation certificate cites a check valve (non-return valve, NRV) as an isolation device."
+    response: "STOP_AND_ESCALATE (SES-02). Check valves are not isolation devices. Request positive physical isolation per site isolation standard."
+    prohibited_ai_response: "Accept check valve with extra monitoring or PPE as compensating measure"
+
+  - id: "ICP-02"
+    name: "dbbl_for_idlh_toxic_service"
+    signal: "DBB valve is cited as isolation for confirmed IDLH-concentration toxic service (H₂S, HF, Chlorine, Phosgene, Ammonia above threshold, etc.)."
+    response: >-
+      HIGH_REVIEW or STOP_AND_ESCALATE (SES-02). Challenge: Does the site
+      isolation standard permit DBB as adequate for this specific toxic service?
+      Request site isolation standard section and Blind/Spade List.
+    evidence_required:
+      - "Site isolation standard specifying acceptable methods for this chemical class"
+      - "Blind/Spade List if spectacle blind is required"
+
+  - id: "ICP-03"
+    name: "isolation_not_field_verified"
+    signal: "Isolation is claimed in the JSEA or permit but no field-verified tag number, competent-person confirmation, or Blind List entry is referenced."
+    response: >-
+      EVIDENCE_GAP (CRITICAL). Isolation claims in documents do not confirm
+      field conditions. Request: field tag/ID number, Blind List entry, and
+      named competent person who performed verification.
+    evidence_required:
+      - "Blind/Spade List with tag number and field locator"
+      - "Isolation verification by named Isolation Authority"
+
+  - id: "ICP-04"
+    name: "dead_leg_or_trapped_segment_not_identified"
+    signal: "P&ID trace or user description suggests dead-legs, stub-ends, or stagnant pipe segments between isolation points that may trap pressure or chemical."
+    response: >-
+      AI_HYPOTHESIS: Trapped pressure or material in dead-leg possible.
+      Challenge: Has P&ID been traced to confirm all dead-legs and
+      bypass paths within the isolation boundary? Have all vents and drains
+      been confirmed open and flowing?
+    evidence_required:
+      - "P&ID trace showing all dead-legs within isolation boundary"
+      - "Drain/vent confirmation record for each dead-leg segment"
+
+  - id: "ICP-05"
+    name: "remote_or_automated_valve_as_isolation"
+    signal: "Isolation relies on a remotely operated valve (ROV), control valve, or automated ESD valve without physical lockout."
+    response: >-
+      CRITICAL_REVIEW. Remote-operated valves can be inadvertently opened
+      by control-room action, signal failure, or automatic sequences.
+      Challenge: Is the valve physically locked out? Is the actuator
+      de-energized? Is the control-room aware of the isolation?
+    evidence_required:
+      - "LOTO on actuator (electrical disconnect or pneumatic isolation)"
+      - "Control room acknowledgement and inhibit of remote operation"
+
+  - id: "ICP-06"
+    name: "pressure_confirmed_nonzero_after_isolation"
+    signal: "Field pressure gauge or test shows non-zero pressure after isolation and depressurization have been declared complete."
+    response: "STOP_AND_ESCALATE (SES-06). Do not open any equipment. Investigate source of residual pressure before proceeding."
+    prohibited_ai_response: "Suggest opening slowly with caution; suggest PPE as risk compensating measure"
+
+  - id: "ICP-07"
+    name: "no_decontamination_confirmation"
+    signal: "Equipment is declared ready for opening but no decontamination (flush, purge, steam, chemical neutralization) record has been provided for toxic or flammable service."
+    response: >-
+      EVIDENCE_GAP (CRITICAL or MATERIAL depending on chemical hazard).
+      Request: decontamination procedure reference, completed decontamination
+      record, initial gas test result.
+      If H₂S or pyrophoric service: STOP_AND_ESCALATE (SES-01 or SES-09).
+
+prohibited_inferences:
+  - "A valve is closed because the P&ID shows it in the normally-closed position"
+  - "Isolation is adequate because the permit says it has been completed"
+  - "A check valve prevents backflow under all conditions"
+  - "DBB is always adequate for short-duration work"
+  - "Zero pressure in one part of the system means zero pressure throughout the isolated segment"
+
+change_log:
+  - version: "1.0.0"
+    date: "2026-08-15"
+    change: "Initial creation. Defines 6-tier isolation hierarchy and 7 challenge patterns for process-boundary isolation adequacy."
