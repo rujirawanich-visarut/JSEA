@@ -338,3 +338,15 @@ Now that your local machine has the framework rules and the AI brain unified, ex
 
 4. Press Enter. The 27B model in LM Studio will scan your directory rules and generate the field hazard matrix directly in your VS Code panel entirely offline.
 
+## ⚖️ Summary AGPLv3 License & Developer Intent
+JSEA is licensed under the **GNU Affero General Public License v3.0 (AGPLv3)**. 
+
+### 🎯 Core Intent
+"Choosing GNU AGPLv3 perfectly aligns with our mission: industrial facilities using this tool internally are fully protected to use it for free forever. Concurrently, it legally prevents external developers from taking the core engine, turning it into a proprietary closed-source system, and lock away collective safety advancements."
+
+### 🏢 Protection for Industrial Facilities (Internal Use)
+* **Free Forever:** Facilities are entirely free to host and run JSEA internally at zero cost with an irrevocable right of usage.
+* **No Code Disclosure:** You can modify the code and integrate it with your private infrastructure. There is **ABSOLUTELY NO OBLIGATION** to open-source your internal company data, as long as the system remains strictly on your private corporate network.
+
+### 💻 Obligations for Commercial Cloud Providers
+* **Close the SaaS Loophole:** If an external entity modifies JSEA and hosts it as a network service (SaaS) for profit, they are legally required to make their modified source code available to their users for free under the same AGPLv3 terms.
