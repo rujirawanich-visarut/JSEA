@@ -267,3 +267,74 @@ The complete source metadata, supported claims, limitations, and review dates ar
 The project gratefully acknowledges **NotebookLM**, **Gemini Deep Research**, and **Google AI** as discovery and synthesis aids used to assemble candidate knowledge and locate possible source material. Their outputs are treated as unverified secondary synthesis, not as standards, authorities, or proof. Candidate claims are quarantined, hashed, reviewed, normalized, and linked to traceable sources before they can enter the canonical PICR catalog; rejected claims remain excluded.
 
 Acknowledgement does not imply endorsement by any named author, publisher, regulator, standards body, or AI provider. Public references do not replace applicable law, current site-approved documents, equipment-specific engineering data, field measurements, or review and authorization by competent people.
+
+## 💻 Local Offline Deployment Guide (No-Code/LLM Local Setup)
+
+This guide is for running JSEA completely offline on your local machine using an open-source 27B LLM (e.g., Qwen-2.5-Coder-27B) without writing python runner code, paying for API keys, or leaking private facility data.
+
+### Architecture Overview
+*   **LM Studio (Server Backend):** Acts as your local equivalent of Google Gemini/OpenAI API, hosting the 27B model weights.
+*   **VS Code + Continue (User UI):** Serves as your command interface to feed JSEA rule packages (`shared-references/`) and your custom job contexts to the model.
+
+---
+
+### 🖥️ Minimum Hardware Requirements
+
+Running a 27B (27 Billion Parameter) model requires substantial memory. To run it smoothly alongside VS Code, ensure your system meets these specifications:
+
+*   **GPU (Highly Recommended for Speed):** 
+    *   **NVIDIA RTX:** Minimum 16 GB VRAM (e.g., RTX 4080, RTX 3090, or mobile variants). 24 GB VRAM is optimal to fit the entire model at Q4/Q5 quantization level.
+    *   **Apple Silicon:** Mac Studio or MacBook Pro with M2/M3/M4 Pro, Max, or Ultra with **at least 32 GB of Unified Memory**.
+*   **System RAM (If relying on CPU-only or partial offloading):** 
+    *   Minimum **32 GB RAM** (64 GB highly recommended). 
+    *   *Note:* Running purely on CPU will significantly slow down inference speeds (Tokens Per Second).
+*   **Recommended Quantization:** Download the **GGUF Q4_K_M** or **Q5_K_M** variant of the model in LM Studio. This balances memory consumption with the reasoning capability required for the PICR physics layer.
+
+---
+
+### Step-by-Step Installation
+
+#### 1. Host the Local Model Server (LM Studio)
+1. Download and install **LM Studio** (from `lmstudio.ai`).
+2. Search and download a capable 27B reasoning model (Recommended: `Qwen-2.5-Coder-27B-Instruct` or `Gemma-2-27B-IT`).
+3. Click the **Developer/Local Server icon (Plug emblem)** on the left sidebar.
+4. Set **Context Length** to at least `8192` or `16384` tokens under the Hardware settings (necessary to load all JSEA references).
+5. Click **Start Server** (it will default to expose an API endpoint at `http://localhost:1234`).
+
+#### 2. Setup the User Interface (VS Code)
+1. Download and install **VS Code** (Visual Studio Code).
+2. Open the downloaded `JSEA` repository folder inside VS Code.
+3. Open the **Extensions Market** (`Ctrl + Shift + X` or `Cmd + Shift + X`), search for **Continue** (by continue.dev), and click **Install**.
+
+#### 3. Bridge the UI to your Local Server
+1. Click the **Continue icon** on your VS Code sidebar to open the chat window.
+2. Click the **Gear icon (Settings)** at the bottom of the Continue pane to open its configuration file (`config.json`).
+3. Replace or append your `models` section with the following config block, then save the file:
+
+```json
+{
+  "models": [
+    {
+      "title": "LM Studio JSEA 27B",
+      "provider": "lmstudio",
+      "model": "local-model"
+    }
+  ]
+}
+```
+
+---
+
+### 🏃‍♂️ Running a JSEA Causal Job Analysis
+
+Now that your local machine has the framework rules and the AI brain unified, execute your first run:
+
+1. Select **LM Studio JSEA 27B** from the model selector drop-down at the bottom of the Continue panel.
+2. In the chat interface box, type `@` and select **Folder** (or individual files) and target the `shared-references/` directory.
+3. Type your operational job query right after it in the text box. 
+
+**Example Local Prompt:**
+> `@shared-references Read these JSEA physical policy rules. Act as the Hazard Blind-Spot Mapper and execute a job evaluation based on this context: "Workers are replacing a 4-inch chemical isolation valve under high pressure. The outdoor conditions are changing as heavy rainfall has just begun." Generate a response matching the FIELD_JSA output profile in plain Thai.`
+
+4. Press Enter. The 27B model in LM Studio will scan your directory rules and generate the field hazard matrix directly in your VS Code panel entirely offline.
+
