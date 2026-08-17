@@ -267,3 +267,90 @@ Metadata, Claim ที่รองรับ, ข้อจำกัด และ�
 โครงการขอขอบคุณ **NotebookLM**, **Gemini Deep Research** และ **Google AI** ที่ช่วยรวบรวมและสังเคราะห์ความรู้ตั้งต้น รวมถึงชี้เบาะแสไปยังแหล่งข้อมูลที่ควรตรวจสอบ ผลลัพธ์จากเครื่องมือเหล่านี้ถือเป็น Secondary Synthesis ที่ยังไม่ยืนยัน ไม่ใช่มาตรฐาน แหล่งอำนาจ หรือหลักฐานในตัวเอง ทุก Candidate Claim ต้องถูกกักแยก บันทึก Hash ทบทวน Normalize และเชื่อมกับแหล่งที่ตรวจสอบย้อนกลับได้ก่อนเข้าสู่ Canonical PICR Catalog ส่วน Claim ที่ไม่ผ่านยังคงถูกกันออกจากระบบ
 
 กิตติกรรมประกาศนี้ไม่ได้หมายความว่าผู้เขียน สำนักพิมพ์ หน่วยงานกำกับ องค์กรมาตรฐาน หรือผู้ให้บริการ AI ที่กล่าวถึงให้การรับรองโครงการ แหล่งข้อมูลสาธารณะไม่แทนกฎหมายที่ใช้บังคับ เอกสารโรงงานฉบับปัจจุบัน ข้อมูลวิศวกรรมเฉพาะอุปกรณ์ ผลตรวจวัดหน้างาน หรือการทบทวนและอนุมัติโดยผู้มีความสามารถ
+
+## 💻 Local Offline Deployment Guide (No-Code/LLM Local Setup)
+
+This guide is for running JSEA completely offline on your local machine using an open-source 27B LLM (e.g., Qwen-2.5-Coder-27B) without writing python runner code, paying for API keys, or leaking private facility data.
+
+### Architecture Overview
+*   **LM Studio (Server Backend):** Acts as your local equivalent of Google Gemini/OpenAI API, hosting the 27B model weights.
+*   **VS Code + Continue (User UI):** Serves as your command interface to feed JSEA rule packages (`shared-references/`) and your custom job contexts to the model.
+
+---
+
+### 🖥️ Minimum Hardware Requirements
+
+Running a 27B (27 Billion Parameter) model requires substantial memory. To run it smoothly alongside VS Code, ensure your system meets these specifications:
+
+*   **GPU (Highly Recommended for Speed):** 
+    *   **NVIDIA RTX:** Minimum 16 GB VRAM (e.g., RTX 4080, RTX 3090, or mobile variants). 24 GB VRAM is optimal to fit the entire model at Q4/Q5 quantization level.
+    *   **Apple Silicon:** Mac Studio or MacBook Pro with M2/M3/M4 Pro, Max, or Ultra with **at least 32 GB of Unified Memory**.
+*   **System RAM (If relying on CPU-only or partial offloading):** 
+    *   Minimum **32 GB RAM** (64 GB highly recommended). 
+    *   *Note:* Running purely on CPU will significantly slow down inference speeds (Tokens Per Second).
+*   **Recommended Quantization:** Download the **GGUF Q4_K_M** or **Q5_K_M** variant of the model in LM Studio. This balances memory consumption with the reasoning capability required for the PICR physics layer.
+
+---
+
+### Step-by-Step Installation
+
+#### 1. Host the Local Model Server (LM Studio)
+1. Download and install **LM Studio** (from `lmstudio.ai`).
+2. Search and download a capable 27B reasoning model (Recommended: `Qwen-2.5-Coder-27B-Instruct` or `Gemma-2-27B-IT`).
+3. Click the **Developer/Local Server icon (Plug emblem)** on the left sidebar.
+4. Set **Context Length** to at least `8192` or `16384` tokens under the Hardware settings (necessary to load all JSEA references).
+5. Click **Start Server** (it will default to expose an API endpoint at `http://localhost:1234`).
+
+#### 2. Setup the User Interface (VS Code)
+1. Download and install **VS Code** (Visual Studio Code).
+2. Open the downloaded `JSEA` repository folder inside VS Code.
+3. Open the **Extensions Market** (`Ctrl + Shift + X` or `Cmd + Shift + X`), search for **Continue** (by continue.dev), and click **Install**.
+
+#### 3. Bridge the UI to your Local Server
+1. Click the **Continue icon** on your VS Code sidebar to open the chat window.
+2. Click the **Gear icon (Settings)** at the bottom of the Continue pane to open its configuration file (`config.json`).
+3. Replace or append your `models` section with the following config block, then save the file:
+
+```json
+{
+  "models": [
+    {
+      "title": "LM Studio JSEA 27B",
+      "provider": "lmstudio",
+      "model": "local-model"
+    }
+  ]
+}
+```
+
+---
+
+### 🏃‍♂️ Running a JSEA Causal Job Analysis
+
+Now that your local machine has the framework rules and the AI brain unified, execute your first run:
+
+1. Select **LM Studio JSEA 27B** from the model selector drop-down at the bottom of the Continue panel.
+2. In the chat interface box, type `@` and select **Folder** (or individual files) and target the `shared-references/` directory.
+3. Type your operational job query right after it in the text box. 
+
+**Example Local Prompt:**
+> `@shared-references Read these JSEA physical policy rules. Act as the Hazard Blind-Spot Mapper and execute a job evaluation based on this context: "Workers are replacing a 4-inch chemical isolation valve under high pressure. The outdoor conditions are changing as heavy rainfall has just begun." Generate a response matching the FIELD_JSA output profile in plain Thai.`
+
+4. Press Enter. The 27B model in LM Studio will scan your directory rules and generate the field hazard matrix directly in your VS Code panel entirely offline.
+
+## ⚖️ สรุปสัญญาอนุญาตและเจตนารมณ์ (AGPLv3 Summary & Intent)
+
+โครงการ JSEA นี้ควบคุมภายใต้สัญญาอนุญาต **GNU Affero General Public License v3.0 (AGPLv3)** ซึ่งเป็นสัญญาประเภทเปิดเผยซอร์สโค้ด (Open-Source) ที่ถูกเลือกมาเพื่อตอบโจทย์เจตนารมณ์หลักของโครงการอย่างสมบูรณ์แบบ
+
+### 🎯 เจตนารมณ์หลัก (Core Intent)
+"การเลือก GNU AGPLv3 ตอบโจทย์ความต้องการของโครงการอย่างสมบูรณ์แบบ โรงงานที่นำไปใช้ภายในจะได้รับการปกป้องสิทธิ์ให้ใช้งานฟรีตลอดไป ในขณะเดียวกันก็ช่วยป้องกันไม่ให้ระบบถูกผู้พัฒนารายอื่นฮุบไปเป็นสมองส่วนตัวโดยไม่แบ่งปัน"
+
+---
+
+### 🏢 สิ่งที่โรงงาน/ผู้ใช้ทั่วไปได้รับ (สิทธิ์และการคุ้มครอง)
+* **ใช้งานฟรีตลอดกาล:** โรงงานสามารถดาวน์โหลด นำไปติดตั้ง และใช้งานเพื่อประเมินความปลอดภัยหน้างานได้ฟรีตลอดไป ไม่มีใครสามารถเรียกสิทธิ์คืนหรือเก็บเงินย้อนหลังได้
+* **ปลอดภัยสำหรับใช้ภายใน:** โรงงานสามารถปรับแต่งโค้ด ดัดแปลง หรือเชื่อมต่อกับฐานข้อมูลความลับภายในองค์กรได้เต็มที่ โดย**ไม่มีข้อผูกมัด**ให้ต้องเปิดเผยข้อมูลหรือซอร์สโค้ดภายในสู่สาธารณะ ตราบใดที่ระบบนี้รันอยู่เฉพาะภายในเครือข่ายของบริษัท (Internal Use)
+
+### 💻 สิ่งที่นักพัฒนาเชิงพาณิชย์ต้องปฏิบัติตาม (ข้อผูกมัด)
+* **ห้ามปิดซอร์สโค้ด:** หากมีผู้พัฒนานำ JSEA ไปปรับแต่ง แล้วเปิดให้บริการในรูปแบบระบบคลาวด์สาธารณะหรือเว็บแอปพลิเคชัน (SaaS) เพื่อขายเชิงพาณิชย์ ผู้พัฒนารายนั้น**มีหน้าที่ตามกฎหมาย**ที่จะต้องเปิดเผยซอร์สโค้ดเวอร์ชันดัดแปลงนั้นให้สาธารณะดาวน์โหลดได้ฟรีเช่นกัน
+* **ห้ามฮุบไปเป็นของส่วนตัว:** มาตรการนี้ช่วยการันตีว่า นวัตกรรมความปลอดภัยและรหัสตรรกะฟิสิกส์ (PICR) ของโครงการนี้ จะได้รับการพัฒนาต่อยอดจากชุมชนอย่างต่อเนื่อง และไม่ถูกเปลี่ยนเป็นระบบปิดเพื่อผูกขาดทางการค้า
